@@ -1,0 +1,57 @@
+{
+    "name": "tipoff/vouchers",
+    "description": "Laravel Package for Vouchers :package_description Gift Certificates",
+    "keywords": [
+        "tipoff",
+        "vouchers"
+    ],
+    "homepage": "https://github.com/tipoff/vouchers",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tipoff",
+            "email": "packages@tipoff.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "spatie/laravel-package-tools": "^1.1",
+        "illuminate/contracts": "^8.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0",
+        "phpunit/phpunit": "^9.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tipoff\\Vouchers\\": "src",
+            "Tipoff\\Vouchers\\Database\\Factories\\": "database/factories"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tipoff\\Vouchers\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "psalm": "vendor/bin/psalm",
+        "test": "vendor/bin/phpunit --colors=always",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Tipoff\\Vouchers\\VouchersServiceProvider"
+            ],
+            "aliases": {
+                "Vouchers": "Tipoff\\Vouchers\\VouchersFacade"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

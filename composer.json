@@ -22,7 +22,8 @@
     },
     "require-dev": {
         "orchestra/testbench": "^6.0",
-        "phpunit/phpunit": "^9.3"
+        "phpunit/phpunit": "^9.3",
+        "vimeo/psalm": "^4.4"
     },
     "autoload": {
         "psr-4": {
@@ -47,10 +48,7 @@
         "laravel": {
             "providers": [
                 "Tipoff\\Vouchers\\VouchersServiceProvider"
-            ],
-            "aliases": {
-                "Vouchers": "Tipoff\\Vouchers\\VouchersFacade"
-            }
+            ]
         }
     },
     "minimum-stability": "dev",

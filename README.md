@@ -1,7 +1,7 @@
 # Laravel Package for handling Vouchers used in Ecommerce packages
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/tipoff/vouchers.svg?style=flat-square)](https://packagist.org/packages/tipoff/vouchers)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/tipoff/vouchers/run-tests?label=tests)](https://github.com/tipoff/vouchers/actions?query=workflow%3ATests+branch%3Amaster)
+![Tests](https://github.com/tipoff/vouchers/workflows/Tests/badge.svg)
 [![Total Downloads](https://img.shields.io/packagist/dt/tipoff/vouchers.svg?style=flat-square)](https://packagist.org/packages/tipoff/vouchers)
 
 ## Installation

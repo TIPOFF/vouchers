@@ -16,7 +16,9 @@
     ],
     "require": {
         "php": "^7.4|^8.0",
-        "tipoff/support": "^1.0"
+        "illuminate/contracts": "^8.0",
+        "spatie/laravel-package-tools": "^1.1",
+        "tipoff/checkout": "dev-pdbreen/feature/baseline"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0",
@@ -53,6 +55,10 @@
         {
             "type": "composer",
             "url": "https://nova.laravel.com"
+        },
+        {
+            "type": "path",
+            "url": "../checkout"
         }
     ],
     "minimum-stability": "dev",

@@ -63,7 +63,6 @@ trait HasCartVouchers
         return $cart;
     }
 
-
     protected function getCartInterface(): CartInterface
     {
         Assert::that($this)->isInstanceOf(CartInterface::class);
@@ -85,6 +84,4 @@ trait HasCartVouchers
     {
         return $this->hasMany(Voucher::class);
     }
-
-
 }

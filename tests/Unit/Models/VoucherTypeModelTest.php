@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Tests\Unit\Models;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Tests\TestCase;
 

@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Laravel\Nova\NovaCoreServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use ReflectionClass;
+use Tipoff\Support\SupportServiceProvider;
 use Tipoff\Vouchers\Tests\Support\Models;
 use Tipoff\Vouchers\Tests\Support\Nova;
 use Tipoff\Vouchers\Tests\Support\Providers\NovaTestbenchServiceProvider;
-use Tipoff\Support\SupportServiceProvider;
 use Tipoff\Vouchers\VouchersServiceProvider;
 
 class TestCase extends Orchestra
@@ -60,7 +60,7 @@ class TestCase extends Orchestra
         ]);
 
         // Create stub tables to satisfy FK dependencies
-        foreach(config('vouchers.model_class') as $class) {
+        foreach (config('vouchers.model_class') as $class) {
             $class::createTable();
         }
     }

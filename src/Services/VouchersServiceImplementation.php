@@ -88,5 +88,4 @@ class VouchersServiceImplementation implements VouchersService
 
         return $this;
     }
-
 }

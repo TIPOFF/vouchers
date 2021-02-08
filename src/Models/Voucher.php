@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tipoff\Support\Traits\HasPackageFactory;
@@ -61,6 +62,8 @@ class Voucher extends Model
     public function generateCode()
     {
         $this->code = app(VouchersService::class)->generateVoucherCode();
+
+        return $this;
     }
 
     /**

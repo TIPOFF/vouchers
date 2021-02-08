@@ -69,12 +69,6 @@ EOT;
 
     public function getEnvironmentSetUp($app)
     {
-        // TODO - refactor into common TestCase base provided by support
-        // Fix for Nova guessing namespace for local resources
-        $property = (new ReflectionClass($app))->getProperty('namespace');
-        $property->setAccessible(true);
-        $property->setValue($app, 'Tipoff\\Vouchers\\');
-
         $app['config']->set('tipoff.model_class.user', Models\User::class);
 
         // Create stub tables to satisfy FK dependencies

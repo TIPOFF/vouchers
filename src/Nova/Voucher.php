@@ -52,7 +52,7 @@ class Voucher extends Resource
             ID::make()->sortable(),
             Text::make('Code')->sortable(),
             BelongsTo::make('Customer', 'customer', config('vouchers.nova_class.customer'))->sortable(),
-            BelongsTo::make('Voucher Type')->sortable(),
+            BelongsTo::make('Voucher Type', 'voucher_type', VoucherType::class)->sortable(),
             BelongsTo::make('Location', 'location', config('vouchers.nova_class.location'))->sortable(),
             Date::make('Created At')->sortable(),
             BelongsTo::make('Purchase Order', 'purchaseOrder', config('vouchers.nova_class.order'))->sortable(),
@@ -65,7 +65,7 @@ class Voucher extends Resource
         return [
             Text::make('Code')->exceptOnForms(),
             BelongsTo::make('Customer', 'customer', config('vouchers.nova_class.customer'))->searchable()->withSubtitles()->hideWhenUpdating(),
-            BelongsTo::make('Voucher Type')->hideWhenUpdating(),
+            BelongsTo::make('Voucher Type', 'voucher_type', VoucherType::class)->hideWhenUpdating(),
             BelongsTo::make('Location', 'location', config('vouchers.nova_class.location'))->hideWhenUpdating(),
             BelongsTo::make('Purchase Order', 'purchaseOrder', config('vouchers.nova_class.order'))->exceptOnForms(),
             BelongsTo::make('Redemption Order', 'redemptionOrder', config('vouchers.nova_class.order'))->exceptOnForms(),

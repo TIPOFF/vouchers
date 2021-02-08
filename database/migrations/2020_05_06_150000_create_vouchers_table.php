@@ -19,11 +19,11 @@ class CreateVouchersTable extends Migration
             $table->foreignIdFor(app('customer'));
             $table->foreignIdFor(app('location'));
             $table->foreignIdFor(VoucherType::class);
-            $table->foreignIdFor(app('order'), 'purchase_order_id');
+            $table->foreignIdFor(app('order'), 'purchase_order_id')->nullable();
 
             // Redemption fields
             $table->dateTime('redeemable_at'); // Defaults to 24 hours after created_at
-            $table->foreignIdFor(app('order'));
+            $table->foreignIdFor(app('order'))->nullable();
             $table->dateTime('redeemed_at')->nullable();
 
             // Value - Vouchers can also be for 1 or more participants instead of an amount. Later could add ability for vouchers to be for a particular product like redeeming a free t-shirt

@@ -4,17 +4,39 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers\Models;
 
+use Assert\Assert;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tipoff\Support\Traits\HasPackageFactory;
 use Tipoff\Vouchers\Services\VouchersService;
+use Tipoff\Support\Models\BaseModel;
 
-class Voucher extends Model
+/**
+ * @property int id
+ * @property string code
+ * @property int amount
+ * @property int participants
+ * @property Carbon redeemable_at
+ * @property Carbon redeemed_at
+ * @property Carbon expires_at
+ * @property Carbon created_at
+ * @property Carbon updated_at
+ * // Raw Relations
+ * @property int voucher_type_id
+ * @property int order_id
+ * @property int purchase_order_id
+ * @property int customer_id
+ * @property int location_id
+ * @property int creator_id
+ * @property int updater_id
+ */
+class Voucher extends BaseModel
 {
     use HasPackageFactory;
     use SoftDeletes;
+
+    const DEFAULT_REDEEMABLE_HOURS = 24;
 
     protected $guarded = ['id'];
     protected $casts = [
@@ -28,7 +50,7 @@ class Voucher extends Model
 
         static::creating(function ($voucher) {
             if (empty($voucher->redeemable_at)) {
-                $voucher->redeemable_at = Carbon::now()->addHours(24);
+                $voucher->redeemable_at = Carbon::now()->addHours(self::DEFAULT_REDEEMABLE_HOURS);
             }
             if (auth()->check()) {
                 $voucher->creator_id = auth()->id();
@@ -36,7 +58,7 @@ class Voucher extends Model
             $voucher->generateCode();
         });
 
-        static::saving(function ($voucher) {
+        static::saving(function (Voucher $voucher) {
             $voucher->code = strtoupper($voucher->code);
 
             if (auth()->check()) {
@@ -45,12 +67,11 @@ class Voucher extends Model
             if (empty($voucher->expires_at)) {
                 $voucher->expires_at = Carbon::parse($voucher->created_at)->addDays($voucher->voucher_type->expiration_days);
             }
-            if (empty($voucher->amount) && empty($voucher->participants)) {
-                throw new \Exception('A voucher must have either an amount or number of participants.');
-            }
-            if (! empty($voucher->amount) && ! empty($voucher->participants)) {
-                throw new \Exception('A voucher cannot have both an amount & number of participants.');
-            }
+
+            Assert::lazy()
+                ->that(empty($voucher->amount) && empty($voucher->participants), 'amount')->false('A voucher must have either an amount or number of participants.')
+                ->that(! empty($voucher->amount) && ! empty($voucher->participants), 'amount')->false('A voucher cannot have both an amount & number of participants.')
+                ->verifyNow();
         });
     }
 
@@ -59,7 +80,7 @@ class Voucher extends Model
      *
      * @return self
      */
-    public function generateCode()
+    public function generateCode(): self
     {
         $this->code = app(VouchersService::class)->generateVoucherCode();
 
@@ -73,7 +94,7 @@ class Voucher extends Model
      * @param string|Carbon $date
      * @return Builder
      */
-    public function scopeValidAt($query, $date)
+    public function scopeValidAt(Builder $query, $date): Builder
     {
         return $query
             ->whereDate('expires_at', '>=', $date)
@@ -81,12 +102,19 @@ class Voucher extends Model
             ->whereNull('redeemed_at');
     }
 
+    public function scopeByCartId(Builder $query, int $cartId): Builder
+    {
+        return $query->whereHas('carts', function ($q) use ($cartId) {
+            $q->where('id', $cartId);
+        });
+    }
+
     /**
      * Reset voucher.
      *
      * @return self
      */
-    public function reset()
+    public function reset(): self
     {
         $this->redeemed_at = null;
         $this->purchase_order_id = null;
@@ -105,7 +133,7 @@ class Voucher extends Model
      * @param string|Carbon $date
      * @return bool
      */
-    public function isValidAt($date)
+    public function isValidAt($date): bool
     {
         if (! $date instanceof Carbon) {
             $date = new Carbon($date);
@@ -119,7 +147,7 @@ class Voucher extends Model
             return false;
         }
 
-        if (empty($this->redeemed_at)) {
+        if (!empty($this->redeemed_at)) {
             return false;
         }
 
@@ -131,7 +159,7 @@ class Voucher extends Model
      *
      * @return string
      */
-    public function decoratedAmount()
+    public function decoratedAmount(): string
     {
         return '$' . number_format($this->amount / 100, 2, '.', ',');
     }
@@ -141,7 +169,7 @@ class Voucher extends Model
      *
      * @return self
      */
-    public function redeem()
+    public function redeem(): self
     {
         $this->redeemed_at = Carbon::now();
 

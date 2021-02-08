@@ -4,14 +4,35 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Assert\Assert;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasPackageFactory;
 
-class VoucherType extends Model
+/**
+ * @property int id
+ * @property string name
+ * @property string title
+ * @property string slug
+ * @property bool is_sellable
+ * @property int sell_price
+ * @property int amount
+ * @property int participants
+ * @property int expiration_days
+ * @property Carbon created_at
+ * @property Carbon updated_at
+ * // Raw Relations
+ * @property int creator_id
+ * @property int updater_id
+ */
+class VoucherType extends BaseModel
 {
     use HasPackageFactory;
     use SoftDeletes;
+
+    const DEFAULT_EXPIRATION_DAYS = 365;
 
     protected $guarded = ['id'];
 
@@ -35,11 +56,12 @@ class VoucherType extends Model
                 $vouchertype->updater_id = auth()->id();
             }
             if (empty($vouchertype->expiration_days)) {
-                $vouchertype->expiration_days = 365;
+                $vouchertype->expiration_days = self::DEFAULT_EXPIRATION_DAYS;
             }
-            if (! empty($vouchertype->amount) && ! empty($vouchertype->participants)) {
-                throw new \Exception('A voucher cannot have both an amount & number of participants.');
-            }
+
+            Assert::lazy()
+                ->that(! empty($vouchertype->amount) && ! empty($vouchertype->participants), 'amount')->false('A voucher cannot have both an amount & number of participants.')
+                ->verifyNow();
         });
     }
 
@@ -58,7 +80,7 @@ class VoucherType extends Model
         return $this->belongsTo(app('user'), 'updater_id');
     }
 
-    public function scopeIsSellable($query, $status = true)
+    public function scopeIsSellable(Builder $query, bool $status = true): Builder
     {
         return $query->where('is_sellable', $status);
     }

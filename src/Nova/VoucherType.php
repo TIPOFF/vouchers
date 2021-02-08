@@ -80,9 +80,9 @@ class VoucherType extends Resource
     {
         return [
             ID::make(),
-            BelongsTo::make('Created By', 'creator', config('vouchers.nova_class.user'))->exceptOnForms(),
+            BelongsTo::make('Created By', 'creator', app()->getAlias('nova.user'))->exceptOnForms(),
             DateTime::make('Created At')->exceptOnForms(),
-            BelongsTo::make('Updated By', 'updater', config('vouchers.nova_class.user'))->exceptOnForms(),
+            BelongsTo::make('Updated By', 'updater', app()->getAlias('nova.user'))->exceptOnForms(),
             DateTime::make('Updated At')->exceptOnForms(),
         ];
     }

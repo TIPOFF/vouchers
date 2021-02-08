@@ -6,7 +6,6 @@ namespace Tipoff\Vouchers\Tests;
 
 use Laravel\Nova\NovaCoreServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
-use ReflectionClass;
 use Tipoff\Support\SupportServiceProvider;
 use Tipoff\Vouchers\Tests\Support\Models;
 use Tipoff\Vouchers\Tests\Support\Providers\NovaTestbenchServiceProvider;

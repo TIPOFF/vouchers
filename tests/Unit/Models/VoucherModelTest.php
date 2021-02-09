@@ -159,16 +159,20 @@ class VoucherModelTest extends TestCase
     /** @test */
     public function reset()
     {
-        $carts = app('cart')::factory()->count(5)->create();
-
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()
-            ->hasAttached($carts)
             ->create([
                 'redeemed_at' => Carbon::now(),
                 'purchase_order_id' => randomOrCreate(app('order')),
                 'order_id' => randomOrCreate(app('order')),
             ]);
+
+        app('cart')::factory()
+            ->count(5)
+            ->create()
+            ->each(function ($cart) use ($voucher) {
+                $voucher->carts()->attach($cart->id);
+            });
 
         $voucher->refresh();
 

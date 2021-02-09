@@ -8,10 +8,10 @@ use Assert\LazyAssertionException;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tipoff\TestSupport\Models\User;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Services\VouchersService;
-use Tipoff\Vouchers\Tests\Support\Models\User;
 use Tipoff\Vouchers\Tests\TestCase;
 
 class VoucherModelTest extends TestCase
@@ -159,16 +159,20 @@ class VoucherModelTest extends TestCase
     /** @test */
     public function reset()
     {
-        $carts = app('cart')::factory()->count(5)->create();
-
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()
-            ->hasAttached($carts)
             ->create([
                 'redeemed_at' => Carbon::now(),
                 'purchase_order_id' => randomOrCreate(app('order')),
                 'order_id' => randomOrCreate(app('order')),
             ]);
+
+        app('cart')::factory()
+            ->count(5)
+            ->create()
+            ->each(function ($cart) use ($voucher) {
+                $voucher->carts()->attach($cart->id);
+            });
 
         $voucher->refresh();
 

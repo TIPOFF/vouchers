@@ -9,7 +9,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tipoff\Support\Models\BaseModel;
+use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
+use Tipoff\Support\Traits\HasUpdater;
 
 /**
  * @property int id
@@ -30,15 +32,23 @@ use Tipoff\Support\Traits\HasPackageFactory;
 class VoucherType extends BaseModel
 {
     use HasPackageFactory;
+    use HasCreator;
+    use HasUpdater;
     use SoftDeletes;
 
     const DEFAULT_EXPIRATION_DAYS = 365;
 
     protected $guarded = ['id'];
 
-
     protected $casts = [
+        'id' => 'integer',
         'is_sellable' => 'boolean',
+        'sell_price' => 'integer',
+        'amount' => 'integer',
+        'participants' => 'integer',
+        'expiration_days' => 'integer',
+        'creator_id' => 'integer',
+        'updater_id' => 'integer',
     ];
 
     protected static function boot()
@@ -68,16 +78,6 @@ class VoucherType extends BaseModel
     public function vouchers()
     {
         return $this->hasMany(Voucher::class);
-    }
-
-    public function creator()
-    {
-        return $this->belongsTo(app('user'), 'creator_id');
-    }
-
-    public function updater()
-    {
-        return $this->belongsTo(app('user'), 'updater_id');
     }
 
     public function scopeIsSellable(Builder $query, bool $status = true): Builder

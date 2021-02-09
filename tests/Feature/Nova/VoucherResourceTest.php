@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Tests\Feature\Nova;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tipoff\TestSupport\Models\User;
 use Tipoff\Vouchers\Models\Voucher;
-use Tipoff\Vouchers\Tests\Support\Models\User;
 use Tipoff\Vouchers\Tests\TestCase;
 
 class VoucherResourceTest extends TestCase

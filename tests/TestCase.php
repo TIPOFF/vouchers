@@ -39,11 +39,7 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app)
     {
-        $app['config']->set('logging.default', 'stderr');
-
         $app['config']->set('tipoff.model_class.user', Models\User::class);
-        $app['config']->set('tipoff.model_class.participant', \Tipoff\EscapeRoom\Models\Participant::class);
-        $app['config']->set('tipoff.nova_class.participant', \Tipoff\EscapeRoom\Nova\Participant::class);
 
         // Create stub tables to satisfy FK dependencies
         foreach (config('tipoff.model_class') as $modelClass) {

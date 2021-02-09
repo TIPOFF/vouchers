@@ -8,8 +8,8 @@ use Assert\LazyAssertionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tipoff\Vouchers\Models\Voucher;
-use Tipoff\Vouchers\Tests\Support\Models\User;
 use Tipoff\Vouchers\Models\VoucherType;
+use Tipoff\Vouchers\Tests\Support\Models\User;
 use Tipoff\Vouchers\Tests\TestCase;
 
 class VoucherTypeModelTest extends TestCase
@@ -129,5 +129,4 @@ class VoucherTypeModelTest extends TestCase
             'participants' => 5,
         ]);
     }
-
 }

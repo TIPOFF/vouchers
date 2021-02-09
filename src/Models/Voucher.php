@@ -8,9 +8,9 @@ use Assert\Assert;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasPackageFactory;
 use Tipoff\Vouchers\Services\VouchersService;
-use Tipoff\Support\Models\BaseModel;
 
 /**
  * @property int id
@@ -147,7 +147,7 @@ class Voucher extends BaseModel
             return false;
         }
 
-        if (!empty($this->redeemed_at)) {
+        if (! empty($this->redeemed_at)) {
             return false;
         }
 

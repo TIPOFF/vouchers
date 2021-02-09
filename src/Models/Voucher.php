@@ -9,7 +9,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tipoff\Support\Models\BaseModel;
+use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
+use Tipoff\Support\Traits\HasUpdater;
 use Tipoff\Vouchers\Services\VouchersService;
 
 /**
@@ -34,14 +36,26 @@ use Tipoff\Vouchers\Services\VouchersService;
 class Voucher extends BaseModel
 {
     use HasPackageFactory;
+    use HasCreator;
+    use HasUpdater;
     use SoftDeletes;
 
     const DEFAULT_REDEEMABLE_HOURS = 24;
 
     protected $guarded = ['id'];
     protected $casts = [
+        'id' => 'integer',
+        'amount' => 'integer',
+        'participants' => 'integer',
         'redeemed_at' => 'datetime',
         'expires_at' => 'datetime',
+        'voucher_type_id' => 'integer',
+        'order_id' => 'integer',
+        'purchase_order_id' => 'integer',
+        'customer_id' => 'integer',
+        'location_id' => 'integer',
+        'creator_id' => 'integer',
+        'updater_id' => 'integer',
     ];
 
     protected static function boot()
@@ -52,18 +66,12 @@ class Voucher extends BaseModel
             if (empty($voucher->redeemable_at)) {
                 $voucher->redeemable_at = Carbon::now()->addHours(self::DEFAULT_REDEEMABLE_HOURS);
             }
-            if (auth()->check()) {
-                $voucher->creator_id = auth()->id();
-            }
             $voucher->generateCode();
         });
 
         static::saving(function (Voucher $voucher) {
             $voucher->code = strtoupper($voucher->code);
 
-            if (auth()->check()) {
-                $voucher->updater_id = auth()->id();
-            }
             if (empty($voucher->expires_at)) {
                 $voucher->expires_at = Carbon::parse($voucher->created_at)->addDays($voucher->voucher_type->expiration_days);
             }
@@ -209,15 +217,5 @@ class Voucher extends BaseModel
     public function carts()
     {
         return $this->belongsToMany(app('cart'))->withTimestamps();
-    }
-
-    public function creator()
-    {
-        return $this->belongsTo(app('user'), 'creator_id');
-    }
-
-    public function updater()
-    {
-        return $this->belongsTo(app('user'), 'updater_id');
     }
 }

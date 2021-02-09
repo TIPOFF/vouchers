@@ -8,10 +8,10 @@ use Assert\LazyAssertionException;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tipoff\TestSupport\Models\User;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Services\VouchersService;
-use Tipoff\Vouchers\Tests\Support\Models\User;
 use Tipoff\Vouchers\Tests\TestCase;
 
 class VoucherModelTest extends TestCase

@@ -26,6 +26,7 @@ If you would like to use the Nova resources included with this package, you need
 ```php
 Nova::resources([
     \Tipoff\Vouchers\Nova\Voucher::class,
+    \Tipoff\Vouchers\Nova\VoucherType::class,
 ]);
 ```
 

@@ -16,7 +16,9 @@
     ],
     "require": {
         "php": "^7.4|^8.0",
-        "tipoff/support": "^1.2",
+        "tipoff/support": "^1.2"
+    },
+    "require-dev": {
         "tipoff/test-support": "^1.0.1"
     },
     "autoload": {

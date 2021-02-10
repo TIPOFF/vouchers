@@ -3,8 +3,8 @@
 namespace Tipoff\Vouchers\Policies;
 
 use App\Models\User;
-use Tipoff\Vouchers\Models\Voucher;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Tipoff\Vouchers\Models\Voucher;
 
 class VoucherPolicy
 {

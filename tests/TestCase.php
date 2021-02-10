@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Tests;
 
 use Laravel\Nova\NovaCoreServiceProvider;
-use Spatie\Permission\PermissionServiceProvider;
 use Tipoff\Support\SupportServiceProvider;
 use Tipoff\TestSupport\BaseTestCase;
 use Tipoff\Vouchers\Tests\Support\Providers\NovaPackageServiceProvider;

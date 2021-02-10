@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Tests\Unit\Policies;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tipoff\Support\Contracts\Models\UserInterface;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Tests\TestCase;
-use Tipoff\Support\Contracts\Models\UserInterface;
 
 class VoucherTypePolicyTest extends TestCase
 {

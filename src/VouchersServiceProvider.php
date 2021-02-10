@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers;
 
+use Illuminate\Support\Facades\Gate;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Tipoff\Vouchers\Commands\VouchersCommand;
+use Tipoff\Vouchers\Models\Voucher;
+use Tipoff\Vouchers\Models\VoucherType;
+use Tipoff\Vouchers\Policies\VoucherPolicy;
+use Tipoff\Vouchers\Policies\VoucherTypePolicy;
 use Tipoff\Vouchers\Services\VouchersService;
 
 class VouchersServiceProvider extends PackageServiceProvider
@@ -20,15 +24,9 @@ class VouchersServiceProvider extends PackageServiceProvider
 
     public function configurePackage(Package $package): void
     {
-        /*
-         * This class is a Package Service Provider
-         *
-         * More info: https://github.com/spatie/laravel-package-tools
-         */
         $package
             ->name('vouchers')
-            ->hasConfigFile()
-            ->hasCommand(VouchersCommand::class);
+            ->hasConfigFile();
     }
 
     public function registeringPackage()
@@ -36,5 +34,8 @@ class VouchersServiceProvider extends PackageServiceProvider
         $this->app->singleton(VouchersService::class, function () {
             return new VouchersService();
         });
+
+        Gate::policy(Voucher::class, VoucherPolicy::class);
+        Gate::policy(VoucherType::class, VoucherTypePolicy::class);
     }
 }

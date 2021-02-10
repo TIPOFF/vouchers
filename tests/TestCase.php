@@ -18,7 +18,6 @@ class TestCase extends BaseTestCase
         return [
             NovaCoreServiceProvider::class,
             NovaPackageServiceProvider::class,
-            PermissionServiceProvider::class,
             SupportServiceProvider::class,
             VouchersServiceProvider::class,
         ];

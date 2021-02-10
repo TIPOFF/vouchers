@@ -6,7 +6,7 @@ namespace Tipoff\Vouchers\Tests\Unit\Seeders;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Schema;
-use Tipoff\Vouchers\Database\Seeders\PermissionsSeeder;
+use Spatie\Permission\PermissionServiceProvider;
 use Tipoff\Vouchers\Tests\TestCase;
 
 class PermissionsSeederTest extends TestCase
@@ -15,28 +15,25 @@ class PermissionsSeederTest extends TestCase
 
     public function setUp(): void
     {
-        parent::setUp();
+        $this->setUpTheTestEnvironment();
 
         include_once __DIR__ . '/../../../vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub';
         (new \CreatePermissionTables())->up();
+
+        parent::setUp();
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return array_merge(parent::getPackageProviders($app), [
+            PermissionServiceProvider::class,
+        ]);
     }
 
     /** @test */
-    public function seed_with_table()
+    public function permissions_seeded()
     {
         $this->assertTrue(Schema::hasTable('permissions'));
-
-        (new PermissionsSeeder())->run();
-
-        $this->assertDatabaseCount('permissions', 7);
-    }
-
-    /** @test */
-    public function seed_with_duplicates()
-    {
-        (new PermissionsSeeder())->run();
-        (new PermissionsSeeder())->run();
-
         $this->assertDatabaseCount('permissions', 7);
     }
 }

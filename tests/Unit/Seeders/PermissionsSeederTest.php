@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers\Tests\Unit\Seeders;
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Schema;
 use Tipoff\Vouchers\Database\Seeders\PermissionsSeeder;
@@ -14,24 +13,17 @@ class PermissionsSeederTest extends TestCase
 {
     use DatabaseTransactions;
 
-    /** @test */
-    public function seed_with_no_table()
+    public function setUp(): void
     {
-        (new PermissionsSeeder())->run();
+        parent::setUp();
 
-        $this->assertFalse(Schema::hasTable('permissions'));
+        include_once __DIR__ . '/../../../vendor/spatie/laravel-permission/database/migrations/create_permission_tables.php.stub';
+        (new \CreatePermissionTables())->up();
     }
 
     /** @test */
     public function seed_with_table()
     {
-        Schema::create('permissions', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->string('guard_name');
-            $table->timestamps();
-        });
-
         $this->assertTrue(Schema::hasTable('permissions'));
 
         (new PermissionsSeeder())->run();
@@ -42,13 +34,6 @@ class PermissionsSeederTest extends TestCase
     /** @test */
     public function seed_with_duplicates()
     {
-        Schema::create('permissions', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->string('guard_name');
-            $table->timestamps();
-        });
-
         (new PermissionsSeeder())->run();
         (new PermissionsSeeder())->run();
 

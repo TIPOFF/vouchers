@@ -11,7 +11,6 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tipoff\TestSupport\Models\User;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
-use Tipoff\Vouchers\Services\VouchersService;
 use Tipoff\Vouchers\Tests\TestCase;
 
 class VoucherModelTest extends TestCase
@@ -85,20 +84,12 @@ class VoucherModelTest extends TestCase
     /** @test */
     public function generate_code()
     {
-        $vouchersService = \Mockery::mock(VouchersService::class);
-        $vouchersService
-            ->shouldReceive('generateVoucherCode')
-            ->twice()
-            ->andReturn('abcd');
-
-        $this->app->instance(VouchersService::class, $vouchersService);
-
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()->create();
 
         $voucher->generateCode()->save();
 
-        $this->assertEquals('ABCD', $voucher->code);
+        $this->assertStringStartsWith(Carbon::now()->format('ymd'), $voucher->code);
     }
 
     /** @test */

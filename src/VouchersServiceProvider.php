@@ -7,11 +7,11 @@ namespace Tipoff\Vouchers;
 use Illuminate\Support\Facades\Gate;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Tipoff\Checkout\Contracts\Models\VoucherInterface;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Policies\VoucherPolicy;
 use Tipoff\Vouchers\Policies\VoucherTypePolicy;
-use Tipoff\Vouchers\Services\VouchersService;
 
 class VouchersServiceProvider extends PackageServiceProvider
 {
@@ -31,9 +31,7 @@ class VouchersServiceProvider extends PackageServiceProvider
 
     public function registeringPackage()
     {
-        $this->app->singleton(VouchersService::class, function () {
-            return new VouchersService();
-        });
+        $this->app->bind(VoucherInterface::class, Voucher::class);
 
         Gate::policy(Voucher::class, VoucherPolicy::class);
         Gate::policy(VoucherType::class, VoucherTypePolicy::class);

@@ -16,6 +16,7 @@
     ],
     "require": {
         "php": "^7.4|^8.0",
+        "tipoff/authorization": "^1.0",
         "tipoff/support": "^1.2.1"
     },
     "require-dev": {

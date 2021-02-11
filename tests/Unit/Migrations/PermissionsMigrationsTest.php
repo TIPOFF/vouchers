@@ -13,13 +13,6 @@ class PermissionsMigrationsTest extends TestCase
 {
     use DatabaseTransactions;
 
-    protected function getPackageProviders($app)
-    {
-        return array_merge(parent::getPackageProviders($app), [
-            PermissionServiceProvider::class,
-        ]);
-    }
-
     /** @test */
     public function permissions_seeded()
     {

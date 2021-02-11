@@ -16,8 +16,7 @@
     ],
     "require": {
         "php": "^7.4|^8.0",
-        "spatie/laravel-permission": "^4.0",
-        "tipoff/support": "^1.2"
+        "tipoff/support": "^1.2.1"
     },
     "require-dev": {
         "tipoff/test-support": "^1.0.1"

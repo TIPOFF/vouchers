@@ -6,6 +6,7 @@ namespace Tipoff\Vouchers\Tests;
 
 use Laravel\Nova\NovaCoreServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
+use Tipoff\Addresses\AddressesServiceProvider;
 use Tipoff\Authorization\AuthorizationServiceProvider;
 use Tipoff\Checkout\CheckoutServiceProvider;
 use Tipoff\Support\SupportServiceProvider;
@@ -22,6 +23,7 @@ class TestCase extends BaseTestCase
             NovaPackageServiceProvider::class,
             SupportServiceProvider::class,
             AuthorizationServiceProvider::class,
+            AddressesServiceProvider::class,
             PermissionServiceProvider::class,
             CheckoutServiceProvider::class,
             VouchersServiceProvider::class,

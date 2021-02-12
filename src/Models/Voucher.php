@@ -105,7 +105,7 @@ class Voucher extends BaseModel implements VoucherInterface
     {
         return $query
             ->whereDate('expires_at', '>=', $date)
-            ->where('redeemable_at', '<=', $date)
+            ->whereDate('redeemable_at', '<=', $date)
             ->whereNull('redeemed_at');
     }
 
@@ -168,6 +168,15 @@ class Voucher extends BaseModel implements VoucherInterface
         return $this;
     }
 
+    public function getUser()
+    {
+        // TODO - change to model interface -
+        // $customer = findModel(CustomerInterface::class, $this->customer_id);
+        // return $customer ? $customer->getUser() : null;
+        $customer = $this->customer;
+        return $customer ? $customer->user : null;
+    }
+
     public function purchaseOrder()
     {
         return $this->belongsTo(Order::class, 'purchase_order_id');
@@ -209,7 +218,7 @@ class Voucher extends BaseModel implements VoucherInterface
 
     public static function findDeductionByCode(string $code): ?CartDeduction
     {
-        return Voucher::validAt()->where('code', $code)->validAt(Carbon::now())->first();
+        return Voucher::query()->where('code', $code)->validAt(Carbon::now())->first();
     }
 
     public static function calculateCartDeduction(CartInterface $cart): Money
@@ -235,6 +244,11 @@ class Voucher extends BaseModel implements VoucherInterface
         });
     }
 
+    public static function getCodesForCart(CartInterface $cart): array
+    {
+        return Voucher::query()->byCartId($cart->getId())->pluck('code')->toArray();
+    }
+
     public function applyToCart(CartInterface $cart)
     {
         if ($this->participants > 0) {
@@ -252,11 +266,6 @@ class Voucher extends BaseModel implements VoucherInterface
         }
     }
 
-    public function getCodesForCart(CartInterface $cart): array
-    {
-        return Voucher::query()->byCartId($cart->getId())->pluck('code')->toArray();
-    }
-
     public static function generateVoucherCode(): string
     {
         do {
@@ -271,6 +280,7 @@ class Voucher extends BaseModel implements VoucherInterface
         $vouchers = Voucher::query()->byCartId($cart->getId())->get();
 
         return Voucher::create([
+            'code' => self::generateVoucherCode(),
             'location_id' => $locationId,
             'customer_id' => $userId,
             'voucher_type_id' => self::PARTIAL_REDEMPTION_VOUCHER_TYPE_ID,

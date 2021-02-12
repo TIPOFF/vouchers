@@ -16,12 +16,13 @@
     ],
     "require": {
         "php": "^7.4|^8.0",
+        "tipoff/addresses": "^1.0",
         "tipoff/authorization": "^1.0.1",
-        "tipoff/checkout": "2.0.0",
-        "tipoff/support": "^1.2.3"
+        "tipoff/checkout": "dev-pdbreen/feature/additional-interfaces as 2.0.0",
+        "tipoff/support": "^1.2.6"
     },
     "require-dev": {
-        "tipoff/test-support": "^1.0.2"
+        "tipoff/test-support": "dev-pdbreen/bugfix/user-notifiable as 1.0.2"
     },
     "autoload": {
         "psr-4": {

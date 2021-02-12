@@ -38,8 +38,6 @@ class VoucherType extends BaseModel
 
     const DEFAULT_EXPIRATION_DAYS = 365;
 
-    protected $guarded = ['id'];
-
     protected $casts = [
         'id' => 'integer',
         'is_sellable' => 'boolean',

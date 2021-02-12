@@ -42,7 +42,6 @@ class Voucher extends BaseModel
 
     const DEFAULT_REDEEMABLE_HOURS = 24;
 
-    protected $guarded = ['id'];
     protected $casts = [
         'id' => 'integer',
         'amount' => 'integer',

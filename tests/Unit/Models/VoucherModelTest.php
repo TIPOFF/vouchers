@@ -8,10 +8,12 @@ use Assert\LazyAssertionException;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tipoff\Checkout\Models\Cart;
 use Tipoff\TestSupport\Models\User;
+use Tipoff\Vouchers\Exceptions\UnsupportedVoucherTypeException;
+use Tipoff\Vouchers\Exceptions\VoucherRedeemedException;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
-use Tipoff\Vouchers\Services\VouchersService;
 use Tipoff\Vouchers\Tests\TestCase;
 
 class VoucherModelTest extends TestCase
@@ -85,20 +87,12 @@ class VoucherModelTest extends TestCase
     /** @test */
     public function generate_code()
     {
-        $vouchersService = \Mockery::mock(VouchersService::class);
-        $vouchersService
-            ->shouldReceive('generateVoucherCode')
-            ->twice()
-            ->andReturn('abcd');
-
-        $this->app->instance(VouchersService::class, $vouchersService);
-
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()->create();
 
         $voucher->generateCode()->save();
 
-        $this->assertEquals('ABCD', $voucher->code);
+        $this->assertStringStartsWith(Carbon::now()->format('ymd'), $voucher->code);
     }
 
     /** @test */
@@ -193,7 +187,7 @@ class VoucherModelTest extends TestCase
      * @test
      * @dataProvider data_provider_for_is_valid_at
      */
-    public function is_valid_at(Carbon $expiresAt, Carbon $redeemableAt, ?Carbon $redeemedAt, bool $expected)
+    public function is_valid_at(Carbon $expiresAt, Carbon $redeemableAt, ?Carbon $redeemedAt, $validAt, bool $expected)
     {
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()
@@ -203,17 +197,20 @@ class VoucherModelTest extends TestCase
                 'redeemed_at' => $redeemedAt,
             ]);
 
-        $this->assertEquals($expected, $voucher->isValidAt(Carbon::now()));
+        $this->assertEquals($expected, $voucher->isValidAt($validAt));
     }
 
     public function data_provider_for_is_valid_at()
     {
         return [
-            'valid' => [ Carbon::now()->addDay(), Carbon::now()->subDay(), null, true ],
-            'expired' => [ Carbon::now()->subDay(), Carbon::now()->subDay(), null, false ],
-            'not_redeemable' => [ Carbon::now()->addDay(), Carbon::now()->addDay(), null, false ],
-            'redeemed' => [ Carbon::now()->addDay(), Carbon::now()->subDay(), Carbon::now(), false ],
-            'all_reasons' => [ Carbon::now()->subDay(), Carbon::now()->addDay(), Carbon::now(), false ],
+            'valid' => [ Carbon::now()->addDay(), Carbon::now()->subDay(), null, Carbon::now(), true ],
+            'valid_now' => [ Carbon::now()->addDay(), Carbon::now()->subDay(), null, 'now', true ],
+            'valid_next_week' => [ Carbon::now()->addDay(), Carbon::now()->subDay(), null, 'next week', false ],
+            'expired' => [ Carbon::now()->subDay(), Carbon::now()->subDay(), null, Carbon::now(), false ],
+            'expired_string' => [ Carbon::now()->subDay(), Carbon::now()->subDay(), null, Carbon::now()->format('Ymd'), false ],
+            'not_redeemable' => [ Carbon::now()->addDay(), Carbon::now()->addDay(), null, Carbon::now(), false ],
+            'redeemed' => [ Carbon::now()->addDay(), Carbon::now()->subDay(), Carbon::now(), Carbon::now(), false ],
+            'all_reasons' => [ Carbon::now()->subDay(), Carbon::now()->addDay(), Carbon::now(), Carbon::now(), false ],
         ];
     }
 
@@ -250,10 +247,7 @@ class VoucherModelTest extends TestCase
             Carbon::setTestNow($now);
 
             /** @var Voucher $voucher */
-            $voucher = Voucher::factory()
-                ->create([
-                    'redeemed_at' => null,
-                ]);
+            $voucher = Voucher::factory()->redeemed(false)->create();
 
             $this->assertNull($voucher->redeemed_at);
 
@@ -264,5 +258,236 @@ class VoucherModelTest extends TestCase
         } finally {
             Carbon::setTestNow(null);
         }
+    }
+
+    /** @test */
+    public function scope_by_valid_at()
+    {
+        $today = new Carbon('today');
+
+        // Expired
+        Voucher::factory()->redeemable()->expired()->count(1)->create();
+
+        $count = Voucher::query()->validAt($today)->count();
+        $this->assertEquals(0, $count);
+
+        // Redeemed
+        Voucher::factory()->redeemable()->redeemed(true)->count(1)->create();
+
+        $count = Voucher::query()->validAt($today)->count();
+        $this->assertEquals(0, $count);
+
+        // Not Redeemable
+        Voucher::factory()->redeemable(false)->count(1)->create();
+
+        $count = Voucher::query()->validAt($today)->count();
+        $this->assertEquals(0, $count);
+
+        // Valid
+        Voucher::factory()->redeemable()->count(2)->create();
+
+        $count = Voucher::query()->validAt($today)->count();
+        $this->assertEquals(2, $count);
+    }
+
+    /** @test */
+    public function cart_relation()
+    {
+        /** @var Voucher $voucher */
+        $voucher = Voucher::factory()->create();
+
+        /** @var Cart $cart */
+        $cart = Cart::factory()->create();
+        $voucher->carts()->sync([$cart->id]);
+
+        $voucher->refresh();
+        $this->assertEquals(1, $voucher->carts()->count());
+    }
+
+    /** @test */
+    public function by_cart_id()
+    {
+        /** @var Voucher $voucher */
+        $voucher = Voucher::factory()->create();
+
+        /** @var Cart $cart */
+        $cart = Cart::factory()->create();
+        $voucher->carts()->sync([$cart->id]);
+
+        $vouchers = Voucher::query()->byCartId($cart->id)->get();
+
+        $this->assertEquals(1, $vouchers->count());
+    }
+
+    /** @test */
+    public function find_valid_code()
+    {
+        /** @var Voucher $voucher */
+        $voucher = Voucher::factory()->amount(1000)->create();
+
+        $result = Voucher::findDeductionByCode($voucher->code);
+        $this->assertNotNull($result);
+        $this->assertEquals($voucher->id, $result->getId());
+    }
+
+    /** @test */
+    public function apply_code_to_cart()
+    {
+        /** @var Voucher $voucher */
+        $voucher = Voucher::factory()->amount(1000)->create();
+
+        $cart = Cart::factory()->create();
+
+        $voucher->applyToCart($cart);
+
+        $count = Voucher::query()->byCartId($cart->id)->count();
+        $this->assertEquals(1, $count);
+    }
+
+    /** @test */
+    public function find_unknown_code()
+    {
+        $result = Voucher::findDeductionByCode('TESTCODE');
+        $this->assertNull($result);
+    }
+
+    /** @test */
+    public function find_expired_code()
+    {
+        /** @var Voucher $voucher */
+        $voucher = Voucher::factory()->amount(1000)->expired(true)->create();
+
+        $result = Voucher::findDeductionByCode($voucher->code);
+        $this->assertNull($result);
+    }
+
+    /** @test */
+    public function apply_unsupported_code_to_cart()
+    {
+        /** @var Voucher $voucher */
+        $voucher = Voucher::factory()->participants(5)->create();
+
+        $cart = Cart::factory()->create();
+
+        $this->expectException(UnsupportedVoucherTypeException::class);
+        $this->expectExceptionMessage('Participants vouchers not supported yet.');
+
+        $voucher->applyToCart($cart);
+    }
+
+    /** @test */
+    public function apply_redeemed_code_to_cart()
+    {
+        /** @var Voucher $voucher */
+        $voucher = Voucher::factory()->amount(1000)->redeemed()->create();
+
+        $cart = Cart::factory()->create();
+
+        $this->expectException(VoucherRedeemedException::class);
+        $this->expectExceptionMessage('Voucher already used.');
+
+        $voucher->applyToCart($cart);
+    }
+
+    /** @test */
+    public function calculate_deductions_with_no_voucher()
+    {
+        $cart = Cart::factory()->create();
+
+        $result = Voucher::calculateCartDeduction($cart);
+        $this->assertEquals(0, $result->getUnscaledAmount()->toInt());
+    }
+
+    /** @test */
+    public function calculate_deductions_with_amount_voucher()
+    {
+        /** @var Voucher $voucher */
+        $voucher = Voucher::factory()->amount(1000)->create();
+
+        $cart = Cart::factory()->create();
+
+        $voucher->applyToCart($cart);
+
+        $result = Voucher::calculateCartDeduction($cart);
+        $this->assertEquals(1000, $result->getUnscaledAmount()->toInt());
+    }
+
+    /** @test */
+    public function calculate_discount_with_multiple_discounts()
+    {
+        /** @var Voucher $voucher1 */
+        $voucher1 = Voucher::factory()->amount(1000)->create();
+
+        /** @var Voucher $voucher2 */
+        $voucher2 = Voucher::factory()->amount(500)->create();
+
+        $cart = Cart::factory()->create();
+
+        $voucher1->applyToCart($cart);
+        $voucher2->applyToCart($cart);
+
+        $result = Voucher::calculateCartDeduction($cart);
+        $this->assertEquals(1500, $result->getUnscaledAmount()->toInt());
+    }
+
+    /** @test */
+    public function mark_deductions_as_used()
+    {
+        /** @var Voucher $voucher1 */
+        $voucher1 = Voucher::factory()->amount(1000)->create();
+
+        /** @var Voucher $voucher2 */
+        $voucher2 = Voucher::factory()->amount(500)->create();
+
+        $cart = Cart::factory()->create();
+
+        $voucher1->applyToCart($cart);
+        $voucher2->applyToCart($cart);
+
+        Voucher::markCartDeductionsAsUsed($cart);
+
+        $voucher1->refresh();
+        $this->assertNotNull($voucher1->redeemed_at);
+        $voucher2->refresh();
+        $this->assertNotNull($voucher2->redeemed_at);
+    }
+
+    /** @test */
+    public function get_codes_for_cart()
+    {
+        /** @var Voucher $voucher1 */
+        $voucher1 = Voucher::factory()->amount(1000)->create();
+
+        /** @var Voucher $voucher2 */
+        $voucher2 = Voucher::factory()->amount(500)->create();
+
+        $cart = Cart::factory()->create();
+
+        $voucher1->applyToCart($cart);
+        $voucher2->applyToCart($cart);
+
+        // TODO - update to static when interface is fixed
+        $codes = $voucher1->getCodesForCart($cart);
+
+        $this->assertCount(2, $codes);
+        $this->assertEquals([$voucher1->code, $voucher2->code], $codes);
+    }
+
+    /** @test */
+    public function partial_redemption_voucher()
+    {
+        /** @var Voucher $voucher */
+        $voucher = Voucher::factory()->amount(1000)->create();
+
+        $cart = Cart::factory()->create();
+
+        $voucher->applyToCart($cart);
+
+        $partial = Voucher::issuePartialRedemptionVoucher($cart, $voucher->location_id, 500, $voucher->creator_id);
+
+        $this->assertNotNull($partial);
+        $this->assertTrue($partial->isValidAt('now'));
+        $this->assertEquals(500, $partial->amount);
+        $this->assertEquals($voucher->expires_at->getTimestamp(), $partial->expires_at->getTimestamp());
     }
 }

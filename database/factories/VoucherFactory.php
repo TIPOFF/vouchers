@@ -46,4 +46,66 @@ class VoucherFactory extends Factory
             'updater_id'        => randomOrCreate(app('user')),
         ];
     }
+
+    public function redeemable(bool $isRedeemable = true): self
+    {
+        return $this->state(function (array $attributes) use ($isRedeemable) {
+            return [
+                'redeemed_at'   => null,
+                'order_id'      => null,
+                'expires_at'    => $this->faker->dateTimeBetween($startDate = '+1 month', $endDate = '+1 year', $timezone = null),
+                'redeemable_at' => $isRedeemable
+                    ? $this->faker->dateTimeBetween($startDate = '-1 year', $endDate = '-1 month', $timezone = null)
+                    : $this->faker->dateTimeBetween($startDate = '+1 month', $endDate = '+1 year', $timezone = null),
+            ];
+        });
+    }
+
+    public function amount(?int $amount = null): self
+    {
+        return $this
+            ->redeemable()
+            ->state(function (array $attributes) use ($amount) {
+                return [
+                    'amount'            => $amount ?? $this->faker->numberBetween(100, 1000),
+                    'participants'      => null,
+                ];
+            });
+    }
+
+    public function participants(?int $participants = null): self
+    {
+        return $this
+            ->redeemable()
+            ->state(function (array $attributes) use ($participants) {
+                return [
+                    'amount'            => null,
+                    'participants'      => $participants ?? $this->faker->numberBetween(1, 10),
+                ];
+            });
+    }
+
+    public function redeemed(bool $isRedeemed = true): self
+    {
+        return $this->state(function (array $attributes) use ($isRedeemed) {
+            return [
+                'order_id'    => $isRedeemed ? randomOrCreate(app('order')) : null,
+                'redeemed_at' => $isRedeemed
+                    ? $this->faker->dateTimeBetween($startDate = '-1 years', $endDate = 'now', $timezone = null)
+                    : null,
+            ];
+        });
+    }
+
+    public function expired(bool $isExpired = true): self
+    {
+        return $this->state(function (array $attributes) use ($isExpired) {
+            return [
+                'expires_at' => $isExpired
+                    ? $this->faker->dateTimeBetween($startDate = '-1 year', $endDate = '-1 month', $timezone = null)
+                    : $this->faker->dateTimeBetween($startDate = '+1 month', $endDate = '+1 year', $timezone = null),
+            ];
+        });
+    }
+
 }

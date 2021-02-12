@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Tipoff\Checkout\Models\Order;
 use Tipoff\Vouchers\Models\VoucherType;
 
 class CreateVouchersTable extends Migration
@@ -19,11 +20,11 @@ class CreateVouchersTable extends Migration
             $table->foreignIdFor(app('customer'));
             $table->foreignIdFor(app('location'));
             $table->foreignIdFor(VoucherType::class);
-            $table->foreignIdFor(app('order'), 'purchase_order_id')->nullable();
+            $table->foreignIdFor(Order::class, 'purchase_order_id')->nullable();
 
             // Redemption fields
             $table->dateTime('redeemable_at'); // Defaults to 24 hours after created_at
-            $table->foreignIdFor(app('order'))->nullable();
+            $table->foreignIdFor(Order::class)->nullable();
             $table->dateTime('redeemed_at')->nullable();
 
             // Value - Vouchers can also be for 1 or more participants instead of an amount. Later could add ability for vouchers to be for a particular product like redeeming a free t-shirt

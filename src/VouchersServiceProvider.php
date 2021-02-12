@@ -4,38 +4,38 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers;
 
-use Illuminate\Support\Facades\Gate;
-use Spatie\LaravelPackageTools\Package;
-use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Tipoff\Checkout\Contracts\Models\VoucherInterface;
+use Tipoff\Checkout\Events\BookingOrderProcessed;
+use Tipoff\Support\TipoffPackage;
+use Tipoff\Support\TipoffServiceProvider;
+use Tipoff\Vouchers\Listeners\PartialRedemptionCheck;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Policies\VoucherPolicy;
 use Tipoff\Vouchers\Policies\VoucherTypePolicy;
-use Tipoff\Vouchers\Services\VouchersService;
 
-class VouchersServiceProvider extends PackageServiceProvider
+class VouchersServiceProvider extends TipoffServiceProvider
 {
-    public function boot()
+    public function configureTipoffPackage(TipoffPackage $package): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-
-        parent::boot();
-    }
-
-    public function configurePackage(Package $package): void
-    {
+        // Base configuration
         $package
             ->name('vouchers')
             ->hasConfigFile();
-    }
 
-    public function registeringPackage()
-    {
-        $this->app->singleton(VouchersService::class, function () {
-            return new VouchersService();
-        });
-
-        Gate::policy(Voucher::class, VoucherPolicy::class);
-        Gate::policy(VoucherType::class, VoucherTypePolicy::class);
+        // Tipoff configuration
+        $package
+            ->hasPolicies([
+                Voucher::class => VoucherPolicy::class,
+                VoucherType::class => VoucherTypePolicy::class,
+            ])
+            ->hasModelInterfaces([
+                VoucherInterface::class => Voucher::class,
+            ])
+            ->hasEvents([
+                BookingOrderProcessed::class => [
+                    PartialRedemptionCheck::class,
+                ],
+            ]);
     }
 }

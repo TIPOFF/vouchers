@@ -16,7 +16,6 @@ use Tipoff\Vouchers\Policies\VoucherTypePolicy;
 
 class VouchersServiceProvider extends TipoffServiceProvider
 {
-
     public function configureTipoffPackage(TipoffPackage $package): void
     {
         // Base configuration
@@ -31,13 +30,12 @@ class VouchersServiceProvider extends TipoffServiceProvider
                 VoucherType::class => VoucherTypePolicy::class,
             ])
             ->hasModelInterfaces([
-                VoucherInterface::class => Voucher::class
+                VoucherInterface::class => Voucher::class,
             ])
             ->hasEvents([
                 BookingOrderProcessed::class => [
                     PartialRedemptionCheck::class,
-                ]
+                ],
             ]);
     }
-
 }

@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tipoff\Checkout\Models\Cart;
-use Tipoff\Checkout\Models\Order;
 use Tipoff\TestSupport\Models\User;
 use Tipoff\Vouchers\Exceptions\UnsupportedVoucherTypeException;
 use Tipoff\Vouchers\Exceptions\VoucherRedeemedException;

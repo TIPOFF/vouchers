@@ -32,7 +32,8 @@ class PartialRedemptionCheckTest extends TestCase
         event(new BookingOrderProcessed($order));
 
         Notification::assertSentTo(
-            [$voucher->getUser()], PartialRedemptionVoucherCreated::class
+            [$voucher->getUser()],
+            PartialRedemptionVoucherCreated::class
         );
     }
 

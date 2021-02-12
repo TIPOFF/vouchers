@@ -174,6 +174,7 @@ class Voucher extends BaseModel implements VoucherInterface
         // $customer = findModel(CustomerInterface::class, $this->customer_id);
         // return $customer ? $customer->getUser() : null;
         $customer = $this->customer;
+
         return $customer ? $customer->user : null;
     }
 

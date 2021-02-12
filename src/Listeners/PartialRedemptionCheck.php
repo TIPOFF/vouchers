@@ -14,8 +14,8 @@ class PartialRedemptionCheck
     {
         $order = $event->order;
 
-        /** @var Voucher $voucher */
         if ($voucher = $order->getPartialRedemptionVoucher()) {
+            /** @var Voucher $voucher */
             if ($user = $voucher->getUser()) {
                 $user->notify(new PartialRedemptionVoucherCreated($voucher));
             }

@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers;
 
-use Tipoff\Vouchers\Models\Voucher;
-use Tipoff\Vouchers\Models\VoucherType;
-use Tipoff\Vouchers\Policies\VoucherPolicy;
-use Tipoff\Vouchers\Policies\VoucherTypePolicy;
 use Tipoff\Support\TipoffPackage;
 use Tipoff\Support\TipoffServiceProvider;
+use Tipoff\Vouchers\Models\Voucher;
+use Tipoff\Vouchers\Policies\VoucherPolicy;
+use Tipoff\Vouchers\Policies\VoucherTypePolicy;
 
 class VouchersServiceProvider extends TipoffServiceProvider
 {

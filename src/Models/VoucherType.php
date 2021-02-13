@@ -53,16 +53,7 @@ class VoucherType extends BaseModel
     {
         parent::boot();
 
-        static::creating(function ($vouchertype) {
-            if (auth()->check()) {
-                $vouchertype->creator_id = auth()->id();
-            }
-        });
-
         static::saving(function ($vouchertype) {
-            if (auth()->check()) {
-                $vouchertype->updater_id = auth()->id();
-            }
             if (empty($vouchertype->expiration_days)) {
                 $vouchertype->expiration_days = self::DEFAULT_EXPIRATION_DAYS;
             }

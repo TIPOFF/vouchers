@@ -19,16 +19,15 @@
         "tipoff/addresses": "^1.0.1",
         "tipoff/authorization": "^1.0.1",
         "tipoff/checkout": "^2.0.1",
-        "tipoff/support": "^1.2.6"
+        "tipoff/support": "^1.3.0"
     },
     "require-dev": {
-        "tipoff/test-support": "^1.0.3"
+        "tipoff/test-support": "^1.0.4"
     },
     "autoload": {
         "psr-4": {
             "Tipoff\\Vouchers\\": "src",
-            "Tipoff\\Vouchers\\Database\\Factories\\": "database/factories",
-            "Tipoff\\Vouchers\\Database\\Seeders\\": "database/seeders"
+            "Tipoff\\Vouchers\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {

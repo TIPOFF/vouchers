@@ -16,9 +16,9 @@ use Laravel\Nova\Fields\Slug;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
-use Tipoff\Support\Nova\Resource;
+use Tipoff\Support\Nova\BaseResource;
 
-class VoucherType extends Resource
+class VoucherType extends BaseResource
 {
     public static $model = \Tipoff\Vouchers\Models\VoucherType::class;
 
@@ -70,7 +70,7 @@ class VoucherType extends Resource
             Number::make('Participants')->nullable(),
             Number::make('Expiration Days')->nullable(),
 
-            HasMany::make('Vouchers'),
+            HasMany::make('Vouchers', 'vouchers', nova('voucher')),
 
             new Panel('Data Fields', $this->dataFields()),
         ];
@@ -80,9 +80,9 @@ class VoucherType extends Resource
     {
         return [
             ID::make(),
-            BelongsTo::make('Created By', 'creator', app()->getAlias('nova.user'))->exceptOnForms(),
+            BelongsTo::make('Created By', 'creator', nova('user'))->exceptOnForms(),
             DateTime::make('Created At')->exceptOnForms(),
-            BelongsTo::make('Updated By', 'updater', app()->getAlias('nova.user'))->exceptOnForms(),
+            BelongsTo::make('Updated By', 'updater', nova('user'))->exceptOnForms(),
             DateTime::make('Updated At')->exceptOnForms(),
         ];
     }

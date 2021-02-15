@@ -14,9 +14,9 @@ use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
-use Tipoff\Support\Nova\Resource;
+use Tipoff\Support\Nova\BaseResource;
 
-class Voucher extends Resource
+class Voucher extends BaseResource
 {
     public static $model = \Tipoff\Vouchers\Models\Voucher::class;
 
@@ -51,12 +51,12 @@ class Voucher extends Resource
         return [
             ID::make()->sortable(),
             Text::make('Code')->sortable(),
-            BelongsTo::make('Customer', 'customer', app()->getAlias('nova.customer'))->sortable(),
-            BelongsTo::make('Voucher Type', 'voucher_type', VoucherType::class)->sortable(),
-            BelongsTo::make('Location', 'location', app()->getAlias('nova.location'))->sortable(),
+            BelongsTo::make('Customer', 'customer', nova('customer'))->sortable(),
+            BelongsTo::make('Voucher Type', 'voucher_type', nova('voucher'))->sortable(),
+            BelongsTo::make('Location', 'location', nova('location'))->sortable(),
             Date::make('Created At')->sortable(),
-            BelongsTo::make('Purchase Order', 'purchaseOrder', app()->getAlias('nova.order'))->sortable(),
-            BelongsTo::make('Redemption Order', 'redemptionOrder', app()->getAlias('nova.order'))->sortable(),
+            BelongsTo::make('Purchase Order', 'purchaseOrder', nova('order'))->sortable(),
+            BelongsTo::make('Redemption Order', 'redemptionOrder', nova('order'))->sortable(),
         ];
     }
 
@@ -64,11 +64,11 @@ class Voucher extends Resource
     {
         return [
             Text::make('Code')->exceptOnForms(),
-            BelongsTo::make('Customer', 'customer', app()->getAlias('nova.customer'))->searchable()->withSubtitles()->hideWhenUpdating(),
-            BelongsTo::make('Voucher Type', 'voucher_type', VoucherType::class)->hideWhenUpdating(),
-            BelongsTo::make('Location', 'location', app()->getAlias('nova.location'))->hideWhenUpdating(),
-            BelongsTo::make('Purchase Order', 'purchaseOrder', app()->getAlias('nova.order'))->exceptOnForms(),
-            BelongsTo::make('Redemption Order', 'redemptionOrder', app()->getAlias('nova.order'))->exceptOnForms(),
+            BelongsTo::make('Customer', 'customer', nova('customer'))->searchable()->withSubtitles()->hideWhenUpdating(),
+            BelongsTo::make('Voucher Type', 'voucher_type', nova('vouchertype'))->hideWhenUpdating(),
+            BelongsTo::make('Location', 'location', nova('location'))->hideWhenUpdating(),
+            BelongsTo::make('Purchase Order', 'purchaseOrder', nova('order'))->exceptOnForms(),
+            BelongsTo::make('Redemption Order', 'redemptionOrder', nova('order'))->exceptOnForms(),
             Date::make('Redeemed At', 'redeemed_at')->format('DD-MM-YYYY HH:mm:ss')->exceptOnForms(),
             Currency::make('Amount')->asMinorUnits()
                 ->step('0.01')
@@ -90,9 +90,9 @@ class Voucher extends Resource
     {
         return [
             ID::make(),
-            BelongsTo::make('Created By', 'creator', app()->getAlias('nova.user'))->exceptOnForms(),
+            BelongsTo::make('Created By', 'creator', nova('user'))->exceptOnForms(),
             DateTime::make('Created At')->exceptOnForms(),
-            BelongsTo::make('Updated By', 'updater', app()->getAlias('nova.user'))->exceptOnForms(),
+            BelongsTo::make('Updated By', 'updater', nova('user'))->exceptOnForms(),
             DateTime::make('Updated At')->exceptOnForms(),
         ];
     }

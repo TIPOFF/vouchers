@@ -32,19 +32,24 @@ class VoucherType extends BaseResource
 
     public static $group = 'Operations Units';
 
+    /** @psalm-suppress UndefinedClass */
+    protected array $filterClassList = [
+
+    ];
+
     public function fieldsForIndex(NovaRequest $request)
     {
-        return [
+        return array_filter([
             ID::make(),
             Text::make('Name')->sortable(),
             Currency::make('Amount')->asMinorUnits()->sortable(),
             Number::make('Participants')->sortable(),
-        ];
+        ]);
     }
 
     public function fields(Request $request)
     {
-        return [
+        return array_filter([
             Text::make('Name (Internal)', 'name')->required(),
             Slug::make('Slug')->from('Name'),
             Text::make('Title (What Customers See)', 'title')->required(),
@@ -70,40 +75,18 @@ class VoucherType extends BaseResource
             Number::make('Participants')->nullable(),
             Number::make('Expiration Days')->nullable(),
 
-            HasMany::make('Vouchers', 'vouchers', nova('voucher')),
+            nova('voucher') ? HasMany::make('Vouchers', 'vouchers', nova('voucher')) : null,
 
             new Panel('Data Fields', $this->dataFields()),
-        ];
+        ]);
     }
 
-    protected function dataFields()
+    protected function dataFields(): array
     {
-        return [
-            ID::make(),
-            BelongsTo::make('Created By', 'creator', nova('user'))->exceptOnForms(),
-            DateTime::make('Created At')->exceptOnForms(),
-            BelongsTo::make('Updated By', 'updater', nova('user'))->exceptOnForms(),
-            DateTime::make('Updated At')->exceptOnForms(),
-        ];
-    }
-
-    public function cards(Request $request)
-    {
-        return [];
-    }
-
-    public function filters(Request $request)
-    {
-        return [];
-    }
-
-    public function lenses(Request $request)
-    {
-        return [];
-    }
-
-    public function actions(Request $request)
-    {
-        return [];
+        return array_merge(
+            parent::dataFields(),
+            $this->creatorDataFields(),
+            $this->updaterDataFields(),
+        );
     }
 }

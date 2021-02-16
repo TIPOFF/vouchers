@@ -46,29 +46,34 @@ class Voucher extends BaseResource
 
     public static $group = 'Operations Units';
 
+    /** @psalm-suppress UndefinedClass */
+    protected array $filterClassList = [
+
+    ];
+
     public function fieldsForIndex(NovaRequest $request)
     {
-        return [
+        return array_filter([
             ID::make()->sortable(),
             Text::make('Code')->sortable(),
-            BelongsTo::make('Customer', 'customer', nova('customer'))->sortable(),
-            BelongsTo::make('Voucher Type', 'voucher_type', nova('voucher'))->sortable(),
-            BelongsTo::make('Location', 'location', nova('location'))->sortable(),
+            nova('customer') ? BelongsTo::make('Customer', 'customer', nova('customer'))->sortable() : null,
+            nova('voucher') ? BelongsTo::make('Voucher Type', 'voucher_type', nova('voucher'))->sortable() : null,
+            nova('location') ? BelongsTo::make('Location', 'location', nova('location'))->sortable() : null,
             Date::make('Created At')->sortable(),
-            BelongsTo::make('Purchase Order', 'purchaseOrder', nova('order'))->sortable(),
-            BelongsTo::make('Redemption Order', 'redemptionOrder', nova('order'))->sortable(),
-        ];
+            nova('order') ? BelongsTo::make('Purchase Order', 'purchaseOrder', nova('order'))->sortable() : null,
+            nova('order') ? BelongsTo::make('Redemption Order', 'redemptionOrder', nova('order'))->sortable() : null,
+        ]);
     }
 
     public function fields(Request $request)
     {
-        return [
+        return array_filter([
             Text::make('Code')->exceptOnForms(),
-            BelongsTo::make('Customer', 'customer', nova('customer'))->searchable()->withSubtitles()->hideWhenUpdating(),
-            BelongsTo::make('Voucher Type', 'voucher_type', nova('vouchertype'))->hideWhenUpdating(),
-            BelongsTo::make('Location', 'location', nova('location'))->hideWhenUpdating(),
-            BelongsTo::make('Purchase Order', 'purchaseOrder', nova('order'))->exceptOnForms(),
-            BelongsTo::make('Redemption Order', 'redemptionOrder', nova('order'))->exceptOnForms(),
+            nova('customer') ? BelongsTo::make('Customer', 'customer', nova('customer'))->searchable()->withSubtitles()->hideWhenUpdating() : null,
+            nova('vouchertype') ? BelongsTo::make('Voucher Type', 'voucher_type', nova('vouchertype'))->hideWhenUpdating() : null,
+            nova('location') ? BelongsTo::make('Location', 'location', nova('location'))->hideWhenUpdating() : null,
+            nova('order') ? BelongsTo::make('Purchase Order', 'purchaseOrder', nova('order'))->exceptOnForms() : null,
+            nova('order') ? BelongsTo::make('Redemption Order', 'redemptionOrder', nova('order'))->exceptOnForms() : null,
             Date::make('Redeemed At', 'redeemed_at')->format('DD-MM-YYYY HH:mm:ss')->exceptOnForms(),
             Currency::make('Amount')->asMinorUnits()
                 ->step('0.01')
@@ -83,40 +88,15 @@ class Voucher extends BaseResource
             Date::make('Expires At', 'expires_at')->format('DD-MM-YYYY HH:mm:ss')->exceptOnForms(),
 
             new Panel('Data Fields', $this->dataFields()),
-        ];
+        ]);
     }
 
-    protected function dataFields()
+    protected function dataFields(): array
     {
-        return [
-            ID::make(),
-            BelongsTo::make('Created By', 'creator', nova('user'))->exceptOnForms(),
-            DateTime::make('Created At')->exceptOnForms(),
-            BelongsTo::make('Updated By', 'updater', nova('user'))->exceptOnForms(),
-            DateTime::make('Updated At')->exceptOnForms(),
-        ];
-    }
-
-    public function cards(Request $request)
-    {
-        return [];
-    }
-
-    public function filters(Request $request)
-    {
-        return [
-            // TODO -- class will need app level override to add this for now...
-            // new Filters\OrderLocation,
-        ];
-    }
-
-    public function lenses(Request $request)
-    {
-        return [];
-    }
-
-    public function actions(Request $request)
-    {
-        return [];
+        return array_merge(
+            parent::dataFields(),
+            $this->creatorDataFields(),
+            $this->updaterDataFields(),
+        );
     }
 }

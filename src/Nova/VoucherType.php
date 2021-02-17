@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Nova;
 
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Currency;
-use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
@@ -16,9 +14,9 @@ use Laravel\Nova\Fields\Slug;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
-use Tipoff\Support\Nova\Resource;
+use Tipoff\Support\Nova\BaseResource;
 
-class VoucherType extends Resource
+class VoucherType extends BaseResource
 {
     public static $model = \Tipoff\Vouchers\Models\VoucherType::class;
 
@@ -32,19 +30,24 @@ class VoucherType extends Resource
 
     public static $group = 'Operations Units';
 
+    /** @psalm-suppress UndefinedClass */
+    protected array $filterClassList = [
+
+    ];
+
     public function fieldsForIndex(NovaRequest $request)
     {
-        return [
+        return array_filter([
             ID::make(),
             Text::make('Name')->sortable(),
             Currency::make('Amount')->asMinorUnits()->sortable(),
             Number::make('Participants')->sortable(),
-        ];
+        ]);
     }
 
     public function fields(Request $request)
     {
-        return [
+        return array_filter([
             Text::make('Name (Internal)', 'name')->required(),
             Slug::make('Slug')->from('Name'),
             Text::make('Title (What Customers See)', 'title')->required(),
@@ -70,40 +73,18 @@ class VoucherType extends Resource
             Number::make('Participants')->nullable(),
             Number::make('Expiration Days')->nullable(),
 
-            HasMany::make('Vouchers'),
+            nova('voucher') ? HasMany::make('Vouchers', 'vouchers', nova('voucher')) : null,
 
             new Panel('Data Fields', $this->dataFields()),
-        ];
+        ]);
     }
 
-    protected function dataFields()
+    protected function dataFields(): array
     {
-        return [
-            ID::make(),
-            BelongsTo::make('Created By', 'creator', app()->getAlias('nova.user'))->exceptOnForms(),
-            DateTime::make('Created At')->exceptOnForms(),
-            BelongsTo::make('Updated By', 'updater', app()->getAlias('nova.user'))->exceptOnForms(),
-            DateTime::make('Updated At')->exceptOnForms(),
-        ];
-    }
-
-    public function cards(Request $request)
-    {
-        return [];
-    }
-
-    public function filters(Request $request)
-    {
-        return [];
-    }
-
-    public function lenses(Request $request)
-    {
-        return [];
-    }
-
-    public function actions(Request $request)
-    {
-        return [];
+        return array_merge(
+            parent::dataFields(),
+            $this->creatorDataFields(),
+            $this->updaterDataFields(),
+        );
     }
 }

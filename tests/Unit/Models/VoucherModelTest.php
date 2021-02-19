@@ -92,7 +92,7 @@ class VoucherModelTest extends TestCase
 
         $voucher->generateCode()->save();
 
-        $this->assertStringStartsWith(Carbon::now()->format('ymd'), $voucher->code);
+        $this->assertStringStartsWith(Carbon::now('America/New_York')->format('ymd'), $voucher->code);
     }
 
     /** @test */

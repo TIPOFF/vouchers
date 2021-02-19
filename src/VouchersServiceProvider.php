@@ -29,6 +29,10 @@ class VouchersServiceProvider extends TipoffServiceProvider
                 Voucher::class => VoucherPolicy::class,
                 VoucherType::class => VoucherTypePolicy::class,
             ])
+            ->hasNovaResources([
+                \Tipoff\Vouchers\Nova\Voucher::class,
+                \Tipoff\Vouchers\Nova\VoucherType::class,
+            ])
             ->hasModelInterfaces([
                 VoucherInterface::class => Voucher::class,
             ])

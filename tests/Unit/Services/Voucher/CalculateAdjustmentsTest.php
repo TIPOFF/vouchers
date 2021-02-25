@@ -30,7 +30,7 @@ class CalculateAdjustmentsTest extends TestCase
     public function calculate_credit_with_no_voucher()
     {
         $this->withCart([
-            [2500, 1]
+            [2500, 1],
         ], function ($cart) {
             Voucher::calculateAdjustments($cart);
         });
@@ -43,7 +43,7 @@ class CalculateAdjustmentsTest extends TestCase
     public function calculate_credit_with_amount_voucher()
     {
         $this->withCart([
-            [2500, 1]
+            [2500, 1],
         ], function ($cart) {
             /** @var Voucher $voucher */
             $voucher = Voucher::factory()->amount(1000)->create();
@@ -61,7 +61,7 @@ class CalculateAdjustmentsTest extends TestCase
     public function calculate_credit_with_multiple_vouchers()
     {
         $this->withCart([
-            [2500, 1]
+            [2500, 1],
         ], function ($cart) {
             /** @var Voucher $voucher1 */
             $voucher1 = Voucher::factory()->amount(1000)->create();
@@ -83,7 +83,7 @@ class CalculateAdjustmentsTest extends TestCase
     public function ensure_credit_is_capped()
     {
         $this->withCart([
-            [500, 1]
+            [500, 1],
         ], function ($cart) {
             /** @var Voucher $voucher */
             $voucher = Voucher::factory()->amount(1000)->create();

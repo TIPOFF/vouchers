@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Models;
 
 use Assert\Assert;
-use Brick\Money\Money;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;

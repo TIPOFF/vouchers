@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers\Services\Voucher;
 
-
 use Tipoff\Support\Contracts\Checkout\CartInterface;
 use Tipoff\Vouchers\Models\Voucher;
 

@@ -325,7 +325,7 @@ class VoucherModelTest extends TestCase
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()->amount(1000)->create();
 
-        $result = Voucher::findDeductionByCode($voucher->code);
+        $result = Voucher::findByCode($voucher->code);
         $this->assertNotNull($result);
         $this->assertEquals($voucher->id, $result->getId());
     }
@@ -347,7 +347,7 @@ class VoucherModelTest extends TestCase
     /** @test */
     public function find_unknown_code()
     {
-        $result = Voucher::findDeductionByCode('TESTCODE');
+        $result = Voucher::findByCode('TESTCODE');
         $this->assertNull($result);
     }
 
@@ -357,7 +357,7 @@ class VoucherModelTest extends TestCase
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()->amount(1000)->expired(true)->create();
 
-        $result = Voucher::findDeductionByCode($voucher->code);
+        $result = Voucher::findByCode($voucher->code);
         $this->assertNull($result);
     }
 
@@ -387,47 +387,6 @@ class VoucherModelTest extends TestCase
         $this->expectExceptionMessage('Voucher already used.');
 
         $voucher->applyToCart($cart);
-    }
-
-    /** @test */
-    public function calculate_deductions_with_no_voucher()
-    {
-        $cart = Cart::factory()->create();
-
-        $result = Voucher::calculateCartDeduction($cart);
-        $this->assertEquals(0, $result->getUnscaledAmount()->toInt());
-    }
-
-    /** @test */
-    public function calculate_deductions_with_amount_voucher()
-    {
-        /** @var Voucher $voucher */
-        $voucher = Voucher::factory()->amount(1000)->create();
-
-        $cart = Cart::factory()->create();
-
-        $voucher->applyToCart($cart);
-
-        $result = Voucher::calculateCartDeduction($cart);
-        $this->assertEquals(1000, $result->getUnscaledAmount()->toInt());
-    }
-
-    /** @test */
-    public function calculate_discount_with_multiple_discounts()
-    {
-        /** @var Voucher $voucher1 */
-        $voucher1 = Voucher::factory()->amount(1000)->create();
-
-        /** @var Voucher $voucher2 */
-        $voucher2 = Voucher::factory()->amount(500)->create();
-
-        $cart = Cart::factory()->create();
-
-        $voucher1->applyToCart($cart);
-        $voucher2->applyToCart($cart);
-
-        $result = Voucher::calculateCartDeduction($cart);
-        $this->assertEquals(1500, $result->getUnscaledAmount()->toInt());
     }
 
     /** @test */

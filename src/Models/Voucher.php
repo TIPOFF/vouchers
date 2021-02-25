@@ -10,17 +10,18 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use Tipoff\Checkout\Contracts\Models\CartDeduction;
-use Tipoff\Checkout\Contracts\Models\CartInterface;
-use Tipoff\Checkout\Contracts\Models\VoucherInterface;
 use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\Order;
+use Tipoff\Support\Contracts\Checkout\CartInterface;
+use Tipoff\Support\Contracts\Checkout\CodedCartAdjustment;
+use Tipoff\Support\Contracts\Checkout\Vouchers\VoucherInterface;
 use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
 use Tipoff\Support\Traits\HasUpdater;
 use Tipoff\Vouchers\Exceptions\UnsupportedVoucherTypeException;
 use Tipoff\Vouchers\Exceptions\VoucherRedeemedException;
+use Tipoff\Vouchers\Services\Voucher\CalculateAdjustments;
 
 /**
  * @property int id
@@ -212,29 +213,6 @@ class Voucher extends BaseModel implements VoucherInterface
         return $this->belongsToMany(Cart::class)->withTimestamps();
     }
 
-    /******************************
-     * VoucherInterface Implementation
-     ******************************/
-
-    public static function findDeductionByCode(string $code): ?CartDeduction
-    {
-        return Voucher::query()->where('code', $code)->validAt(Carbon::now())->first();
-    }
-
-    public static function calculateCartDeduction(CartInterface $cart): Money
-    {
-        $vouchers = Voucher::query()->byCartId($cart->getId())->get();
-
-        return $vouchers->reduce(function (Money $total, Voucher $voucher) {
-            $amount = Money::ofMinor($voucher->amount, 'USD');
-            if ($amount->isPositive()) {
-                $total = $total->plus($amount);
-            }
-
-            return $total;
-        }, Money::ofMinor(0, 'USD'));
-    }
-
     public static function markCartDeductionsAsUsed(CartInterface $cart): void
     {
         $vouchers = Voucher::query()->byCartId($cart->getId())->get();
@@ -242,28 +220,6 @@ class Voucher extends BaseModel implements VoucherInterface
         $vouchers->each(function (Voucher $voucher) {
             $voucher->redeem()->save();
         });
-    }
-
-    public static function getCodesForCart(CartInterface $cart): array
-    {
-        return Voucher::query()->byCartId($cart->getId())->pluck('code')->toArray();
-    }
-
-    public function applyToCart(CartInterface $cart)
-    {
-        if ($this->participants > 0) {
-            throw new UnsupportedVoucherTypeException('Participants vouchers not supported yet.');
-        }
-
-        if (! empty($this->redeemed_at)) {
-            throw new VoucherRedeemedException();
-        }
-
-        if ($this->amount > 0) {
-            $this->carts()->syncWithoutDetaching([$cart->getId()]);
-
-            return;
-        }
     }
 
     public static function generateVoucherCode(): string
@@ -291,4 +247,47 @@ class Voucher extends BaseModel implements VoucherInterface
             'updater_id' => $userId,
         ]);
     }
+
+    //region INTERFACE
+
+    public static function findByCode(string $code): ?CodedCartAdjustment
+    {
+        return Voucher::query()->where('code', $code)->validAt(Carbon::now())->first();
+    }
+
+    public static function calculateAdjustments(CartInterface $cart): void
+    {
+        app(CalculateAdjustments::class)($cart);
+    }
+
+    public static function getCodesForCart(CartInterface $cart): array
+    {
+        return Voucher::query()->byCartId($cart->getId())->pluck('code')->toArray();
+    }
+
+    public function applyToCart(CartInterface $cart)
+    {
+        if ($this->participants > 0) {
+            throw new UnsupportedVoucherTypeException('Participants vouchers not supported yet.');
+        }
+
+        if (! empty($this->redeemed_at)) {
+            throw new VoucherRedeemedException();
+        }
+
+        if ($this->amount > 0) {
+            $this->carts()->syncWithoutDetaching([$cart->getId()]);
+        }
+
+        return $this;
+    }
+
+    public function removeFromCart(CartInterface $cart)
+    {
+        $this->carts()->detach($this->id);
+
+        return $this;
+    }
+
+    //endregion
 }

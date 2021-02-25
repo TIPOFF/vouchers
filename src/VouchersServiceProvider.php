@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers;
 
-use Tipoff\Checkout\Contracts\Models\VoucherInterface;
 use Tipoff\Checkout\Events\BookingOrderProcessed;
+use Tipoff\Support\Contracts\Checkout\Vouchers\VoucherInterface;
 use Tipoff\Support\TipoffPackage;
 use Tipoff\Support\TipoffServiceProvider;
 use Tipoff\Vouchers\Listeners\PartialRedemptionCheck;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers\Commands;
 
-use Tipoff\Vouchers\Models\Voucher;
 use Illuminate\Console\Command;
+use Tipoff\Vouchers\Models\Voucher;
 
 class VouchersValidate extends Command
 {

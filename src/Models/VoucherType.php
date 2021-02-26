@@ -8,11 +8,11 @@ use Assert\Assert;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Tipoff\Support\Contracts\Sellable\VoucherType as Sellable;
 use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
 use Tipoff\Support\Traits\HasUpdater;
-use Tipoff\Support\Contracts\Sellable\VoucherType as Sellable;
 
 /**
  * @property int id

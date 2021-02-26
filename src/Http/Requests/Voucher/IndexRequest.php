@@ -6,5 +6,4 @@ namespace Tipoff\Vouchers\Http\Requests\Voucher;
 
 class IndexRequest extends VoucherRequest
 {
-
 }

@@ -75,6 +75,6 @@ class VoucherType extends BaseModel implements Sellable
 
     public function getDescription(): string
     {
-        $this->title;
+        return $this->title;
     }
 }

@@ -133,9 +133,9 @@ class Voucher extends BaseModel implements VoucherInterface
         return $this;
     }
 
-    public function isOwner(UserInterface $user): bool
+    public function isOwner($userId): bool
     {
-        return $this->getUser()->id === $user->id;
+        return $this->getUser()->id === $userId;
     }
 
     /**

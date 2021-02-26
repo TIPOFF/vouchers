@@ -8,11 +8,11 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Notification;
 use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\Order;
+use Tipoff\Support\Events\Checkout\OrderCreated;
 use Tipoff\Vouchers\Listeners\OrderCreatedListener;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Notifications\PartialRedemptionVoucherCreated;
 use Tipoff\Vouchers\Tests\TestCase;
-use Tipoff\Support\Events\Checkout\OrderCreated;
 
 class OrderCreatedListenerTest extends TestCase
 {

@@ -13,6 +13,7 @@ use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Policies\VoucherPolicy;
 use Tipoff\Vouchers\Policies\VoucherTypePolicy;
+use Tipoff\Vouchers\Commands\VouchersValidate;
 
 class VouchersServiceProvider extends TipoffServiceProvider
 {
@@ -40,6 +41,9 @@ class VouchersServiceProvider extends TipoffServiceProvider
                 BookingOrderProcessed::class => [
                     PartialRedemptionCheck::class,
                 ],
+            ])
+            ->hasCommands([
+                VouchersValidate::class,
             ]);
     }
 }

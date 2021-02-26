@@ -39,6 +39,7 @@ class VouchersServiceProvider extends TipoffServiceProvider
                 OrderCreatedListener::class => [
                     OrderCreatedListener::class,
                 ],
-            ]);
+            ])
+            ->hasApiRoute('api');
     }
 }

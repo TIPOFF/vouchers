@@ -12,6 +12,7 @@ use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
 use Tipoff\Support\Traits\HasUpdater;
+use Tipoff\Support\Contracts\Sellable\VoucherType as Sellable;
 
 /**
  * @property int id
@@ -29,7 +30,7 @@ use Tipoff\Support\Traits\HasUpdater;
  * @property int creator_id
  * @property int updater_id
  */
-class VoucherType extends BaseModel
+class VoucherType extends BaseModel implements Sellable
 {
     use HasPackageFactory;
     use HasCreator;
@@ -53,10 +54,8 @@ class VoucherType extends BaseModel
     {
         parent::boot();
 
-        static::saving(function ($vouchertype) {
-            if (empty($vouchertype->expiration_days)) {
-                $vouchertype->expiration_days = self::DEFAULT_EXPIRATION_DAYS;
-            }
+        static::saving(function (VoucherType $vouchertype) {
+            $vouchertype->expiration_days = $vouchertype->expiration_days ?: self::DEFAULT_EXPIRATION_DAYS;
 
             Assert::lazy()
                 ->that(! empty($vouchertype->amount) && ! empty($vouchertype->participants), 'amount')->false('A voucher cannot have both an amount & number of participants.')
@@ -72,5 +71,10 @@ class VoucherType extends BaseModel
     public function scopeIsSellable(Builder $query, bool $status = true): Builder
     {
         return $query->where('is_sellable', $status);
+    }
+
+    public function getDescription(): string
+    {
+        $this->title;
     }
 }

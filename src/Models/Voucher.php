@@ -14,6 +14,7 @@ use Tipoff\Checkout\Models\Order;
 use Tipoff\Support\Contracts\Checkout\CartInterface;
 use Tipoff\Support\Contracts\Checkout\CodedCartAdjustment;
 use Tipoff\Support\Contracts\Checkout\Vouchers\VoucherInterface;
+use Tipoff\Support\Contracts\Models\UserInterface;
 use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
@@ -27,6 +28,7 @@ use Tipoff\Vouchers\Services\Voucher\CalculateAdjustments;
  * @property string code
  * @property int amount
  * @property int participants
+ * @property VoucherType voucher_type
  * @property Carbon redeemable_at
  * @property Carbon redeemed_at
  * @property Carbon expires_at
@@ -91,6 +93,13 @@ class Voucher extends BaseModel implements VoucherInterface
         return $this;
     }
 
+    public function scopeByUser(Builder $query, $user): Builder
+    {
+        return $query->whereHas('customer', function ($q) use ($user) {
+            $q->where('user_id', $user->id ?? 0);
+        });
+    }
+
     public function scopeValidAt(Builder $query, $date): Builder
     {
         return $query
@@ -122,6 +131,11 @@ class Voucher extends BaseModel implements VoucherInterface
         $this->save();
 
         return $this;
+    }
+
+    public function isOwner(UserInterface $user): bool
+    {
+        return $this->getUser()->id === $user->id;
     }
 
     /**

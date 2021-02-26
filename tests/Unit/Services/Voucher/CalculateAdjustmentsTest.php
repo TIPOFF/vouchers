@@ -6,8 +6,8 @@ namespace Tipoff\Vouchers\Tests\Unit\Services\Voucher;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tipoff\Checkout\Models\Cart;
+use Tipoff\TestSupport\Models\TestSellable;
 use Tipoff\Vouchers\Models\Voucher;
-use Tipoff\Vouchers\Tests\Support\Models\TestSellable;
 use Tipoff\Vouchers\Tests\TestCase;
 
 class CalculateAdjustmentsTest extends TestCase

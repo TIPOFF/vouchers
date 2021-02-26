@@ -8,6 +8,7 @@ use Tipoff\Checkout\Events\BookingOrderProcessed;
 use Tipoff\Support\Contracts\Checkout\Vouchers\VoucherInterface;
 use Tipoff\Support\TipoffPackage;
 use Tipoff\Support\TipoffServiceProvider;
+use Tipoff\Vouchers\Listeners\OrderCreatedListener;
 use Tipoff\Vouchers\Listeners\PartialRedemptionCheck;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
@@ -39,6 +40,9 @@ class VouchersServiceProvider extends TipoffServiceProvider
             ->hasEvents([
                 BookingOrderProcessed::class => [
                     PartialRedemptionCheck::class,
+                ],
+                OrderCreatedListener::class => [
+                    OrderCreatedListener::class,
                 ],
             ]);
     }

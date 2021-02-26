@@ -72,19 +72,10 @@ class Voucher extends BaseModel implements VoucherInterface
     {
         parent::boot();
 
-        static::creating(function ($voucher) {
-            if (empty($voucher->redeemable_at)) {
-                $voucher->redeemable_at = Carbon::now()->addHours(self::DEFAULT_REDEEMABLE_HOURS);
-            }
-            $voucher->generateCode();
-        });
-
         static::saving(function (Voucher $voucher) {
-            $voucher->code = strtoupper($voucher->code);
-
-            if (empty($voucher->expires_at)) {
-                $voucher->expires_at = Carbon::parse($voucher->created_at)->addDays($voucher->voucher_type->expiration_days);
-            }
+            $voucher->expires_at = $voucher->expires_at ?: Carbon::parse($voucher->created_at)->addDays($voucher->voucher_type->expiration_days);
+            $voucher->redeemable_at = $voucher->redeemable_at ?: Carbon::now()->addHours(self::DEFAULT_REDEEMABLE_HOURS);
+            $voucher->code = strtoupper($voucher->code ?: static::generateVoucherCode());
 
             Assert::lazy()
                 ->that(empty($voucher->amount) && empty($voucher->participants), 'amount')->false('A voucher must have either an amount or number of participants.')
@@ -113,6 +104,11 @@ class Voucher extends BaseModel implements VoucherInterface
         return $query->whereHas('carts', function ($q) use ($cartId) {
             $q->where('id', $cartId);
         });
+    }
+
+    public function scopeByOrderId(Builder $query, int $orderId): Builder
+    {
+        return $query->where('order_id', $orderId);
     }
 
     public function reset(): self
@@ -160,9 +156,12 @@ class Voucher extends BaseModel implements VoucherInterface
         return '$' . number_format($this->amount / 100, 2, '.', ',');
     }
 
-    public function redeem(): self
+    public function redeem(?Order $order = null): self
     {
         $this->redeemed_at = Carbon::now();
+        if ($order) {
+            $this->order()->associate($order);
+        }
 
         return $this;
     }

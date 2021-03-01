@@ -8,6 +8,8 @@ use Tipoff\Support\Contracts\Checkout\Vouchers\VoucherInterface;
 use Tipoff\Support\TipoffPackage;
 use Tipoff\Support\TipoffServiceProvider;
 use Tipoff\Vouchers\Listeners\OrderCreatedListener;
+use Tipoff\Vouchers\Commands\VouchersValidate;
+use Tipoff\Vouchers\Listeners\PartialRedemptionCheck;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Policies\VoucherPolicy;
@@ -40,6 +42,9 @@ class VouchersServiceProvider extends TipoffServiceProvider
                     OrderCreatedListener::class,
                 ],
             ])
-            ->hasApiRoute('api');
+            ->hasApiRoute('api')
+            ->hasCommands([
+                VouchersValidate::class,
+            ]);
     }
 }

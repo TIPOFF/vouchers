@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
 use Tipoff\Support\Contracts\Models\UserInterface;
 use Tipoff\Vouchers\Models\Voucher;
 

@@ -8,6 +8,7 @@ use Tipoff\Checkout\Contracts\Models\VoucherInterface;
 use Tipoff\Checkout\Events\BookingOrderProcessed;
 use Tipoff\Support\TipoffPackage;
 use Tipoff\Support\TipoffServiceProvider;
+use Tipoff\Vouchers\Commands\VouchersValidate;
 use Tipoff\Vouchers\Listeners\PartialRedemptionCheck;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
@@ -40,6 +41,9 @@ class VouchersServiceProvider extends TipoffServiceProvider
                 BookingOrderProcessed::class => [
                     PartialRedemptionCheck::class,
                 ],
+            ])
+            ->hasCommands([
+                VouchersValidate::class,
             ]);
     }
 }

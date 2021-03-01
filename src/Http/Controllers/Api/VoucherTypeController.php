@@ -19,12 +19,12 @@ class VoucherTypeController extends BaseApiController
     {
         $this->transformer = $transformer;
 
-        $this->authorizeResource(VoucherType::class, 'voucherType');
+        $this->authorizeResource(VoucherType::class);
     }
 
     public function index(IndexRequest $request): JsonResponse
     {
-        $vouchers = VoucherType::query()->isSellable()->paginate($request->getPageSize());
+        $vouchers = VoucherType::query()->visibleBy($request->user())->isSellable()->paginate($request->getPageSize());
 
         return fractal($vouchers, $this->transformer)
             ->respond();

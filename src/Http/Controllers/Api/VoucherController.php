@@ -19,7 +19,7 @@ class VoucherController extends BaseApiController
     {
         $this->transformer = $transformer;
 
-        $this->authorizeResource(Voucher::class, 'voucher');
+        $this->authorizeResource(Voucher::class);
     }
 
     public function index(IndexRequest $request): JsonResponse

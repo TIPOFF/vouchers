@@ -14,11 +14,6 @@ abstract class VoucherTypeRequest extends BaseApiRequest
         return VoucherType::class;
     }
 
-    public function authorize()
-    {
-        return false;
-    }
-
     public function rules()
     {
         return [];

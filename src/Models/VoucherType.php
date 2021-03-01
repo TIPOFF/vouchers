@@ -8,6 +8,7 @@ use Assert\Assert;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Tipoff\Support\Contracts\Models\UserInterface;
 use Tipoff\Support\Contracts\Sellable\VoucherType as Sellable;
 use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasCreator;
@@ -63,9 +64,20 @@ class VoucherType extends BaseModel implements Sellable
         });
     }
 
+    //region RELATIONSHIPS
+
     public function vouchers()
     {
         return $this->hasMany(Voucher::class);
+    }
+
+    //endregion
+
+    //region SCOPES
+
+    public function scopeVisibleBy(Builder $query, UserInterface $user): Builder
+    {
+        return parent::scopeAlwaysVisible($query);
     }
 
     public function scopeIsSellable(Builder $query, bool $status = true): Builder
@@ -73,8 +85,14 @@ class VoucherType extends BaseModel implements Sellable
         return $query->where('is_sellable', $status);
     }
 
+    //endregion
+
+    //region SELLABLE INTERFACE
+
     public function getDescription(): string
     {
         return $this->title;
     }
+
+    //endregion
 }

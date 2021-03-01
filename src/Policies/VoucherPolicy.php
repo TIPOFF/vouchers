@@ -6,6 +6,7 @@ namespace Tipoff\Vouchers\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Tipoff\Support\Contracts\Models\UserInterface;
 use Tipoff\Vouchers\Models\Voucher;
 
@@ -20,11 +21,7 @@ class VoucherPolicy
 
     public function view(UserInterface $user, Voucher $voucher): bool
     {
-        if ($user instanceof Model && $voucher->isOwner($user->id)) {
-            return true;
-        }
-        
-        return $user->hasPermissionTo('view vouchers') ? true : false;
+        return $voucher->isOwner($user) || ($user->hasPermissionTo('view vouchers') ? true : false);
     }
 
     public function create(UserInterface $user): bool

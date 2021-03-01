@@ -14,12 +14,12 @@ class VoucherTypePolicy
 
     public function viewAny(UserInterface $user): bool
     {
-        return $user->hasPermissionTo('view voucher types') ? true : false;
+        return true;
     }
 
     public function view(UserInterface $user, VoucherType $voucherType): bool
     {
-        return $user->hasPermissionTo('view voucher types') ? true : false;
+        return $voucherType->is_sellable || ($user->hasPermissionTo('view voucher types') ? true : false);
     }
 
     public function create(UserInterface $user): bool

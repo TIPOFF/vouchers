@@ -19,10 +19,8 @@
         "tipoff/addresses": "^1.0.1",
         "tipoff/authorization": "^1.0.1",
         "tipoff/checkout": "dev-pdbreen/feature/sellable-checkout as 2.2.1",
-        "tipoff/support": "^1.4.8"
-    },
-    "require-dev": {
-        "tipoff/test-support": "^1.0.6"
+        "tipoff/support": "dev-pdbreen/feature/api-scoping-support as 1.4.8",
+        "tipoff/test-support": "^1.0.7"
     },
     "autoload": {
         "psr-4": {

@@ -10,18 +10,8 @@ use Tipoff\Vouchers\Models\VoucherType;
 
 class VoucherTypeFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = VoucherType::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
     public function definition()
     {
         $sentence = $this->faker->unique()->sentence;
@@ -44,4 +34,38 @@ class VoucherTypeFactory extends Factory
             'updater_id'    => randomOrCreate(app('user')),
         ];
     }
+
+    public function amount(?int $amount): self
+    {
+        return $this
+            ->state(function (array $attributes) use ($amount) {
+                return [
+                    'amount'            => $amount ?? $this->faker->numberBetween(100, 1000),
+                    'participants'      => null,
+                ];
+            });
+    }
+
+    public function participants(?int $participants): self
+    {
+        return $this
+            ->state(function (array $attributes) use ($participants) {
+                return [
+                    'amount'            => null,
+                    'participants'      => $participants ?? $this->faker->numberBetween(1, 10),
+                ];
+            });
+    }
+
+    public function sellable(bool $sellable = true): self
+    {
+        return $this
+            ->state(function (array $attributes) use ($sellable) {
+                return [
+                    'is_sellable' => $sellable,
+                ];
+            });
+    }
+
+
 }

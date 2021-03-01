@@ -14,6 +14,7 @@ use Tipoff\Checkout\Models\Order;
 use Tipoff\Support\Contracts\Checkout\CartInterface;
 use Tipoff\Support\Contracts\Checkout\CodedCartAdjustment;
 use Tipoff\Support\Contracts\Checkout\Vouchers\VoucherInterface;
+use Tipoff\Support\Contracts\Models\UserInterface;
 use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
@@ -85,12 +86,46 @@ class Voucher extends BaseModel implements VoucherInterface
         });
     }
 
-    public function generateCode(): self
-    {
-        $this->code = static::generateVoucherCode();
+    //region RELATIONSHIPS
 
-        return $this;
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(Order::class, 'purchase_order_id');
     }
+
+    public function redemptionOrder()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(app('customer'));
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(app('location'));
+    }
+
+    public function voucher_type()
+    {
+        return $this->belongsTo(VoucherType::class);
+    }
+
+    public function carts()
+    {
+        return $this->belongsToMany(Cart::class)->withTimestamps();
+    }
+
+    //endregion
+
+    //region SCOPES
 
     public function scopeByUser(Builder $query, $user): Builder
     {
@@ -102,8 +137,8 @@ class Voucher extends BaseModel implements VoucherInterface
     public function scopeValidAt(Builder $query, $date): Builder
     {
         return $query
-            ->whereDate('expires_at', '>=', $date)
-            ->whereDate('redeemable_at', '<=', $date)
+            ->where('expires_at', '>=', $date)
+            ->where('redeemable_at', '<=', $date)
             ->whereNull('redeemed_at');
     }
 
@@ -119,22 +154,11 @@ class Voucher extends BaseModel implements VoucherInterface
         return $query->where('order_id', $orderId);
     }
 
-    public function reset(): self
+    //endregion
+
+    public function isOwner(UserInterface $user): bool
     {
-        $this->redeemed_at = null;
-        $this->purchase_order_id = null;
-        $this->order_id = null;
-
-        $this->carts()->sync([]);
-
-        $this->save();
-
-        return $this;
-    }
-
-    public function isOwner($userId): bool
-    {
-        return $this->getUser()->id === $userId;
+        return $this->getUser()->id === $user->getId();
     }
 
     /**
@@ -189,74 +213,13 @@ class Voucher extends BaseModel implements VoucherInterface
         return $customer ? $customer->user : null;
     }
 
-    public function purchaseOrder()
-    {
-        return $this->belongsTo(Order::class, 'purchase_order_id');
-    }
-
-    public function redemptionOrder()
-    {
-        return $this->belongsTo(Order::class, 'order_id');
-    }
-
-    public function order()
-    {
-        return $this->belongsTo(Order::class, 'order_id');
-    }
-
-    public function customer()
-    {
-        return $this->belongsTo(app('customer'));
-    }
-
-    public function location()
-    {
-        return $this->belongsTo(app('location'));
-    }
-
-    public function voucher_type()
-    {
-        return $this->belongsTo(VoucherType::class);
-    }
-
-    public function carts()
-    {
-        return $this->belongsToMany(Cart::class)->withTimestamps();
-    }
-
-    public static function markCartDeductionsAsUsed(CartInterface $cart): void
-    {
-        $vouchers = Voucher::query()->byCartId($cart->getId())->get();
-
-        $vouchers->each(function (Voucher $voucher) {
-            $voucher->redeem()->save();
-        });
-    }
-
     public static function generateVoucherCode(): string
     {
         do {
             $code = Carbon::now('America/New_York')->format('ymd').Str::upper(Str::random(3));
-        } while (Voucher::where('code', $code)->first());
+        } while (Voucher::where('code', $code)->count());
 
         return $code;
-    }
-
-    public static function issuePartialRedemptionVoucher(CartInterface $cart, int $locationId, int $amount, int $userId): VoucherInterface
-    {
-        $vouchers = Voucher::query()->byCartId($cart->getId())->get();
-
-        return Voucher::create([
-            'code' => self::generateVoucherCode(),
-            'location_id' => $locationId,
-            'customer_id' => $userId,
-            'voucher_type_id' => self::PARTIAL_REDEMPTION_VOUCHER_TYPE_ID,
-            'redeemable_at' => now(),
-            'amount' => $amount,
-            'expires_at' => $vouchers->first()->expires_at,
-            'creator_id' => $userId,
-            'updater_id' => $userId,
-        ]);
     }
 
     //region INTERFACE

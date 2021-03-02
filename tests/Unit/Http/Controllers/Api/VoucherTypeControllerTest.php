@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Tests\Unit\Http\Controllers\Api;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tipoff\TestSupport\Models\User;
+use Tipoff\Authorization\Models\User;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Tests\TestCase;
 
@@ -21,7 +21,7 @@ class VoucherTypeControllerTest extends TestCase
 
         VoucherType::factory()->sellable(false)->count(2)->create();
 
-        $this->actingAs($user->removePermissions());
+        $this->actingAs($user);
         $response = $this->getJson('tipoff/voucher-types')
             ->assertOk();
 
@@ -42,7 +42,7 @@ class VoucherTypeControllerTest extends TestCase
 
         $voucherType = VoucherType::factory()->sellable(false)->create();
 
-        $this->actingAs($user->removePermissions());
+        $this->actingAs($user);
 
         $this->getJson("tipoff/voucher-types/{$voucherType->id}")
             ->assertStatus(403);
@@ -57,7 +57,7 @@ class VoucherTypeControllerTest extends TestCase
         /** @var VoucherType $voucherType */
         $voucherType = VoucherType::factory()->sellable()->create();
 
-        $this->actingAs($user->removePermissions());
+        $this->actingAs($user);
 
         $response = $this->getJson("tipoff/voucher-types/{$voucherType->id}")
             ->assertOk();

@@ -7,7 +7,7 @@ namespace Tipoff\Vouchers\Tests\Unit\Models;
 use Assert\LazyAssertionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tipoff\TestSupport\Models\User;
+use Tipoff\Authorization\Models\User;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Tests\TestCase;

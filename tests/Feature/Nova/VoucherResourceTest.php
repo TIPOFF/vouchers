@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Tests\Feature\Nova;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tipoff\TestSupport\Models\User;
+use Tipoff\Authorization\Models\User;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Tests\TestCase;
 
@@ -18,7 +18,7 @@ class VoucherResourceTest extends TestCase
     {
         Voucher::factory()->count(4)->create();
 
-        $this->actingAs(User::factory()->create());
+        $this->actingAs(self::createPermissionedUser('view vouchers', true));
 
         $response = $this->getJson('nova-api/vouchers')
             ->assertOk();

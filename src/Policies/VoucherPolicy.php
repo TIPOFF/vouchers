@@ -14,7 +14,7 @@ class VoucherPolicy
 
     public function viewAny(UserInterface $user): bool
     {
-        return $user->hasPermissionTo('view vouchers') ? true : false;
+        return true;
     }
 
     public function view(UserInterface $user, Voucher $voucher): bool

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Tests\Feature\Nova;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tipoff\Authorization\Models\User;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Tests\TestCase;
 

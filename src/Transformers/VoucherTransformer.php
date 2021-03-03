@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers\Transformers;
 
-use League\Fractal\TransformerAbstract;
+use Tipoff\Support\Transformers\BaseTransformer;
 use Tipoff\Vouchers\Models\Voucher;
 
-class VoucherTransformer extends TransformerAbstract
+class VoucherTransformer extends BaseTransformer
 {
     protected $defaultIncludes = [
     ];
@@ -20,6 +20,7 @@ class VoucherTransformer extends TransformerAbstract
     {
         return [
             'id' => $voucher->id,
+            'name' => $voucher->voucher_type->name,
             'code' => $voucher->code,
             'amount' => $voucher->amount,
             'participants' => $voucher->participants,

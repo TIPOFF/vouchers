@@ -13,6 +13,8 @@ use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Policies\VoucherPolicy;
 use Tipoff\Vouchers\Policies\VoucherTypePolicy;
+use Tipoff\Vouchers\View\Components\VoucherComponent;
+use Tipoff\Vouchers\View\Components\VoucherTypeComponent;
 
 class VouchersServiceProvider extends TipoffServiceProvider
 {
@@ -40,6 +42,10 @@ class VouchersServiceProvider extends TipoffServiceProvider
                 OrderCreatedListener::class => [
                     OrderCreatedListener::class,
                 ],
+            ])
+            ->hasBladeComponents([
+                'voucher' => VoucherComponent::class,
+                'voucher-type' => VoucherTypeComponent::class,
             ])
             ->hasApiRoute('api')
             ->hasCommands([

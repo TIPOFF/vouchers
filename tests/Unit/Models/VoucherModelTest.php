@@ -363,14 +363,16 @@ class VoucherModelTest extends TestCase
         $voucher2 = Voucher::factory()->amount(500)->create();
 
         $cart = Cart::factory()->create();
+        $codes = Voucher::getCodesForCart($cart);
+        $this->assertCount(0, $codes);
 
         $voucher1->applyToCart($cart);
         $voucher2->applyToCart($cart);
 
-        // TODO - update to static when interface is fixed
-        $codes = $voucher1->getCodesForCart($cart);
+        $codes = Voucher::getCodesForCart($cart);
 
         $this->assertCount(2, $codes);
-        $this->assertEquals([$voucher1->code, $voucher2->code], $codes);
+        $this->assertEquals($voucher1->code, $codes[0]->code);
+        $this->assertEquals($voucher2->code, $codes[1]->code);
     }
 }

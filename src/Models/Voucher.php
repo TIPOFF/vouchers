@@ -13,6 +13,7 @@ use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\Order;
 use Tipoff\Support\Contracts\Checkout\CartInterface;
 use Tipoff\Support\Contracts\Checkout\CodedCartAdjustment;
+use Tipoff\Support\Contracts\Checkout\OrderInterface;
 use Tipoff\Support\Contracts\Checkout\Vouchers\VoucherInterface;
 use Tipoff\Support\Contracts\Models\UserInterface;
 use Tipoff\Support\Models\BaseModel;
@@ -22,6 +23,7 @@ use Tipoff\Support\Traits\HasUpdater;
 use Tipoff\Vouchers\Exceptions\UnsupportedVoucherTypeException;
 use Tipoff\Vouchers\Exceptions\VoucherRedeemedException;
 use Tipoff\Vouchers\Services\Voucher\CalculateAdjustments;
+use Tipoff\Vouchers\Transformers\VoucherTransformer;
 
 /**
  * @property int id
@@ -236,7 +238,22 @@ class Voucher extends BaseModel implements VoucherInterface
 
     public static function getCodesForCart(CartInterface $cart): array
     {
-        return Voucher::query()->byCartId($cart->getId())->pluck('code')->toArray();
+        return Voucher::query()->byCartId($cart->getId())->get()->all();
+    }
+
+    public static function getCodesForOrder(OrderInterface $order): array
+    {
+        return Voucher::query()->byOrderId($order->getId())->get()->all();
+    }
+
+    public function getTransformer($context = null)
+    {
+        return new VoucherTransformer();
+    }
+
+    public function getViewComponent($context = null)
+    {
+        return 'tipoff-voucher';
     }
 
     public function getCode()

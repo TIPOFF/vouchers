@@ -18,7 +18,7 @@
         "php": "^7.4|^8.0",
         "tipoff/addresses": "^1.1.0",
         "tipoff/authorization": "^2.2.3",
-        "tipoff/checkout": "dev-pdbreen/bugfix/update-interface as 2.2.1",
+        "tipoff/checkout": "dev-pdbreen/feature/cart-api as 2.2.1",
         "tipoff/support": "^1.5.4"
     },
     "require-dev": {

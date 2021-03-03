@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers\Transformers;
 
-use League\Fractal\TransformerAbstract;
+use Tipoff\Support\Transformers\BaseTransformer;
 use Tipoff\Vouchers\Models\VoucherType;
 
-class VoucherTypeTransformer extends TransformerAbstract
+class VoucherTypeTransformer extends BaseTransformer
 {
     protected $defaultIncludes = [
     ];

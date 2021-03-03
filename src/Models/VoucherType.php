@@ -14,6 +14,7 @@ use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
 use Tipoff\Support\Traits\HasUpdater;
+use Tipoff\Vouchers\Transformers\VoucherTypeTransformer;
 
 /**
  * @property int id
@@ -88,6 +89,16 @@ class VoucherType extends BaseModel implements Sellable
     //endregion
 
     //region SELLABLE INTERFACE
+
+    public function getTransformer($context = null)
+    {
+        return new VoucherTypeTransformer();
+    }
+
+    public function getViewComponent($context = null)
+    {
+        return 'tipoff-voucher-type';
+    }
 
     public function getDescription(): string
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Tests\Unit\Http\Controllers\Api;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Symfony\Component\HttpFoundation\Response;
 use Tipoff\Addresses\Models\Customer;
 use Tipoff\Authorization\Models\User;
 use Tipoff\Vouchers\Models\Voucher;
@@ -44,7 +45,6 @@ class VoucherControllerTest extends TestCase
     /** @test */
     public function show_voucher_i_own()
     {
-        $this->logToStderr();
         /** @var User $user */
         $user = User::factory()->create();
 
@@ -62,6 +62,32 @@ class VoucherControllerTest extends TestCase
             ->assertOk();
 
         $this->assertEquals($voucher->code, $response->json('data.code'));
+        $this->assertNull($response->json('data.voucherType'));
+    }
+
+    /** @test */
+    public function show_voucher_i_own_with_type()
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+
+        // First customer/user
+        $customer = Customer::factory()->create([
+            'user_id' => $user,
+        ]);
+        /** @var Voucher $voucher */
+        $voucher = Voucher::factory()->create([
+            'customer_id' => $customer,
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->getJson("tipoff/vouchers/{$voucher->id}?include=voucherType")
+            ->assertOk();
+
+        $this->assertEquals($voucher->code, $response->json('data.code'));
+        $this->assertNotNull($response->json('data.voucherType'));
+        $this->assertEquals($voucher->voucher_type->name, $response->json('data.voucherType.data.name'));
     }
 
     /** @test */
@@ -77,14 +103,14 @@ class VoucherControllerTest extends TestCase
         $this->actingAs($user);
 
         $this->getJson("tipoff/vouchers/{$voucher->id}")
-            ->assertStatus(403);
+            ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     /** @test */
     public function index_not_logged_in()
     {
         $this->getJson('tipoff/vouchers')
-            ->assertStatus(401);
+            ->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     /** @test */
@@ -93,6 +119,6 @@ class VoucherControllerTest extends TestCase
         $voucher = Voucher::factory()->create();
 
         $this->getJson("tipoff/vouchers/{$voucher->id}")
-            ->assertStatus(401);
+            ->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 }

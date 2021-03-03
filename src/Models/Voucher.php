@@ -239,6 +239,16 @@ class Voucher extends BaseModel implements VoucherInterface
         return Voucher::query()->byCartId($cart->getId())->pluck('code')->toArray();
     }
 
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
     public function applyToCart(CartInterface $cart)
     {
         if ($this->participants > 0) {

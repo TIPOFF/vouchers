@@ -90,7 +90,6 @@ class VoucherType extends BaseModel implements Sellable
 
     //region SELLABLE INTERFACE
 
-
     public function getTransformer($context = null)
     {
         return new VoucherTypeTransformer();

@@ -8,6 +8,8 @@ use Assert\Assert;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Tipoff\Support\Contracts\Models\UserInterface;
+use Tipoff\Support\Contracts\Sellable\VoucherType as Sellable;
 use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
@@ -29,7 +31,7 @@ use Tipoff\Support\Traits\HasUpdater;
  * @property int creator_id
  * @property int updater_id
  */
-class VoucherType extends BaseModel
+class VoucherType extends BaseModel implements Sellable
 {
     use HasPackageFactory;
     use HasCreator;
@@ -53,10 +55,8 @@ class VoucherType extends BaseModel
     {
         parent::boot();
 
-        static::saving(function ($vouchertype) {
-            if (empty($vouchertype->expiration_days)) {
-                $vouchertype->expiration_days = self::DEFAULT_EXPIRATION_DAYS;
-            }
+        static::saving(function (VoucherType $vouchertype) {
+            $vouchertype->expiration_days = $vouchertype->expiration_days ?: self::DEFAULT_EXPIRATION_DAYS;
 
             Assert::lazy()
                 ->that(! empty($vouchertype->amount) && ! empty($vouchertype->participants), 'amount')->false('A voucher cannot have both an amount & number of participants.')
@@ -64,13 +64,35 @@ class VoucherType extends BaseModel
         });
     }
 
+    //region RELATIONSHIPS
+
     public function vouchers()
     {
         return $this->hasMany(Voucher::class);
+    }
+
+    //endregion
+
+    //region SCOPES
+
+    public function scopeVisibleBy(Builder $query, UserInterface $user): Builder
+    {
+        return parent::scopeAlwaysVisible($query);
     }
 
     public function scopeIsSellable(Builder $query, bool $status = true): Builder
     {
         return $query->where('is_sellable', $status);
     }
+
+    //endregion
+
+    //region SELLABLE INTERFACE
+
+    public function getDescription(): string
+    {
+        return $this->title;
+    }
+
+    //endregion
 }

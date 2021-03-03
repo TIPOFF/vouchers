@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers;
 
-use Tipoff\Checkout\Contracts\Models\VoucherInterface;
-use Tipoff\Checkout\Events\BookingOrderProcessed;
+use Tipoff\Support\Contracts\Checkout\Vouchers\VoucherInterface;
 use Tipoff\Support\TipoffPackage;
 use Tipoff\Support\TipoffServiceProvider;
 use Tipoff\Vouchers\Commands\VouchersValidate;
-use Tipoff\Vouchers\Listeners\PartialRedemptionCheck;
+use Tipoff\Vouchers\Listeners\OrderCreatedListener;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Policies\VoucherPolicy;
@@ -38,10 +37,11 @@ class VouchersServiceProvider extends TipoffServiceProvider
                 VoucherInterface::class => Voucher::class,
             ])
             ->hasEvents([
-                BookingOrderProcessed::class => [
-                    PartialRedemptionCheck::class,
+                OrderCreatedListener::class => [
+                    OrderCreatedListener::class,
                 ],
             ])
+            ->hasApiRoute('api')
             ->hasCommands([
                 VouchersValidate::class,
             ]);

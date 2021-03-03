@@ -14,12 +14,12 @@ class VoucherPolicy
 
     public function viewAny(UserInterface $user): bool
     {
-        return $user->hasPermissionTo('view vouchers') ? true : false;
+        return true;
     }
 
     public function view(UserInterface $user, Voucher $voucher): bool
     {
-        return $user->hasPermissionTo('view vouchers') ? true : false;
+        return $voucher->isOwner($user) || ($user->hasPermissionTo('view vouchers') ? true : false);
     }
 
     public function create(UserInterface $user): bool

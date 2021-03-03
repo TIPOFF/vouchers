@@ -8,8 +8,8 @@ use Assert\LazyAssertionException;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tipoff\Authorization\Models\User;
 use Tipoff\Checkout\Models\Cart;
-use Tipoff\TestSupport\Models\User;
 use Tipoff\Vouchers\Exceptions\UnsupportedVoucherTypeException;
 use Tipoff\Vouchers\Exceptions\VoucherRedeemedException;
 use Tipoff\Vouchers\Models\Voucher;
@@ -87,12 +87,9 @@ class VoucherModelTest extends TestCase
     /** @test */
     public function generate_code()
     {
-        /** @var Voucher $voucher */
-        $voucher = Voucher::factory()->create();
+        $code = Voucher::generateVoucherCode();
 
-        $voucher->generateCode()->save();
-
-        $this->assertStringStartsWith(Carbon::now('America/New_York')->format('ymd'), $voucher->code);
+        $this->assertStringStartsWith(Carbon::now('America/New_York')->format('ymd'), $code);
     }
 
     /** @test */
@@ -148,39 +145,6 @@ class VoucherModelTest extends TestCase
             'amount' => 4,
             'participants' => 5,
         ]);
-    }
-
-    /** @test */
-    public function reset()
-    {
-        /** @var Voucher $voucher */
-        $voucher = Voucher::factory()
-            ->create([
-                'redeemed_at' => Carbon::now(),
-                'purchase_order_id' => randomOrCreate(app('order')),
-                'order_id' => randomOrCreate(app('order')),
-            ]);
-
-        app('cart')::factory()
-            ->count(5)
-            ->create()
-            ->each(function ($cart) use ($voucher) {
-                $voucher->carts()->attach($cart->id);
-            });
-
-        $voucher->refresh();
-
-        $this->assertCount(5, $voucher->carts);
-        $this->assertNotNull($voucher->redeemed_at);
-        $this->assertNotNull($voucher->order);
-        $this->assertNotNull($voucher->purchaseOrder);
-
-        $voucher->reset()->refresh();
-
-        $this->assertCount(0, $voucher->carts);
-        $this->assertNull($voucher->redeemed_at);
-        $this->assertNull($voucher->order);
-        $this->assertNull($voucher->purchaseOrder);
     }
 
     /**
@@ -325,7 +289,7 @@ class VoucherModelTest extends TestCase
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()->amount(1000)->create();
 
-        $result = Voucher::findDeductionByCode($voucher->code);
+        $result = Voucher::findByCode($voucher->code);
         $this->assertNotNull($result);
         $this->assertEquals($voucher->id, $result->getId());
     }
@@ -347,7 +311,7 @@ class VoucherModelTest extends TestCase
     /** @test */
     public function find_unknown_code()
     {
-        $result = Voucher::findDeductionByCode('TESTCODE');
+        $result = Voucher::findByCode('TESTCODE');
         $this->assertNull($result);
     }
 
@@ -357,7 +321,7 @@ class VoucherModelTest extends TestCase
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()->amount(1000)->expired(true)->create();
 
-        $result = Voucher::findDeductionByCode($voucher->code);
+        $result = Voucher::findByCode($voucher->code);
         $this->assertNull($result);
     }
 
@@ -390,69 +354,6 @@ class VoucherModelTest extends TestCase
     }
 
     /** @test */
-    public function calculate_deductions_with_no_voucher()
-    {
-        $cart = Cart::factory()->create();
-
-        $result = Voucher::calculateCartDeduction($cart);
-        $this->assertEquals(0, $result->getUnscaledAmount()->toInt());
-    }
-
-    /** @test */
-    public function calculate_deductions_with_amount_voucher()
-    {
-        /** @var Voucher $voucher */
-        $voucher = Voucher::factory()->amount(1000)->create();
-
-        $cart = Cart::factory()->create();
-
-        $voucher->applyToCart($cart);
-
-        $result = Voucher::calculateCartDeduction($cart);
-        $this->assertEquals(1000, $result->getUnscaledAmount()->toInt());
-    }
-
-    /** @test */
-    public function calculate_discount_with_multiple_discounts()
-    {
-        /** @var Voucher $voucher1 */
-        $voucher1 = Voucher::factory()->amount(1000)->create();
-
-        /** @var Voucher $voucher2 */
-        $voucher2 = Voucher::factory()->amount(500)->create();
-
-        $cart = Cart::factory()->create();
-
-        $voucher1->applyToCart($cart);
-        $voucher2->applyToCart($cart);
-
-        $result = Voucher::calculateCartDeduction($cart);
-        $this->assertEquals(1500, $result->getUnscaledAmount()->toInt());
-    }
-
-    /** @test */
-    public function mark_deductions_as_used()
-    {
-        /** @var Voucher $voucher1 */
-        $voucher1 = Voucher::factory()->amount(1000)->create();
-
-        /** @var Voucher $voucher2 */
-        $voucher2 = Voucher::factory()->amount(500)->create();
-
-        $cart = Cart::factory()->create();
-
-        $voucher1->applyToCart($cart);
-        $voucher2->applyToCart($cart);
-
-        Voucher::markCartDeductionsAsUsed($cart);
-
-        $voucher1->refresh();
-        $this->assertNotNull($voucher1->redeemed_at);
-        $voucher2->refresh();
-        $this->assertNotNull($voucher2->redeemed_at);
-    }
-
-    /** @test */
     public function get_codes_for_cart()
     {
         /** @var Voucher $voucher1 */
@@ -471,23 +372,5 @@ class VoucherModelTest extends TestCase
 
         $this->assertCount(2, $codes);
         $this->assertEquals([$voucher1->code, $voucher2->code], $codes);
-    }
-
-    /** @test */
-    public function partial_redemption_voucher()
-    {
-        /** @var Voucher $voucher */
-        $voucher = Voucher::factory()->amount(1000)->create();
-
-        $cart = Cart::factory()->create();
-
-        $voucher->applyToCart($cart);
-
-        $partial = Voucher::issuePartialRedemptionVoucher($cart, $voucher->location_id, 500, $voucher->creator_id);
-
-        $this->assertNotNull($partial);
-        $this->assertTrue($partial->isValidAt('now'));
-        $this->assertEquals(500, $partial->amount);
-        $this->assertEquals($voucher->expires_at->getTimestamp(), $partial->expires_at->getTimestamp());
     }
 }

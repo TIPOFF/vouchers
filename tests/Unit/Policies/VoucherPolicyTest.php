@@ -20,7 +20,7 @@ class VoucherPolicyTest extends TestCase
         $this->assertTrue($user->can('viewAny', Voucher::class));
 
         $user = self::createPermissionedUser('view vouchers', false);
-        $this->assertFalse($user->can('viewAny', Voucher::class));
+        $this->assertTrue($user->can('viewAny', Voucher::class));
     }
 
     /**

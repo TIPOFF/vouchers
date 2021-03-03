@@ -20,7 +20,7 @@ class VoucherTypePolicyTest extends TestCase
         $this->assertTrue($user->can('viewAny', VoucherType::class));
 
         $user = self::createPermissionedUser('view voucher types', false);
-        $this->assertFalse($user->can('viewAny', VoucherType::class));
+        $this->assertTrue($user->can('viewAny', VoucherType::class));
     }
 
     /**
@@ -29,7 +29,7 @@ class VoucherTypePolicyTest extends TestCase
      */
     public function all_permissions_as_creator(string $permission, UserInterface $user, bool $expected)
     {
-        $discount = VoucherType::factory()->make([
+        $discount = VoucherType::factory()->sellable()->make([
             'creator_id' => $user,
         ]);
 
@@ -40,7 +40,7 @@ class VoucherTypePolicyTest extends TestCase
     {
         return [
             'view-true' => [ 'view', self::createPermissionedUser('view voucher types', true), true ],
-            'view-false' => [ 'view', self::createPermissionedUser('view voucher types', false), false ],
+            'view-false' => [ 'view', self::createPermissionedUser('view voucher types', false), true ],
             'create-true' => [ 'create', self::createPermissionedUser('create voucher types', true), true ],
             'create-false' => [ 'create', self::createPermissionedUser('create voucher types', false), false ],
             'update-true' => [ 'update', self::createPermissionedUser('update voucher types', true), true ],
@@ -56,7 +56,7 @@ class VoucherTypePolicyTest extends TestCase
      */
     public function all_permissions_not_creator(string $permission, UserInterface $user, bool $expected)
     {
-        $discount = VoucherType::factory()->make();
+        $discount = VoucherType::factory()->sellable()->make();
 
         $this->assertEquals($expected, $user->can($permission, $discount));
     }

@@ -19,6 +19,7 @@ class VoucherTypeComponentTest extends TestCase
         $cart = Cart::factory()->create();
         CartItem::factory()->withSellable($sellable)->create([
             'cart_id' => $cart,
+            'quantity' => 1,
         ]);
         $cart->refresh()->save();
 

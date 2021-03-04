@@ -1,7 +1,7 @@
 <tr>
     <td>Voucher Type: {{ $sellable->name }}</td>
-    <td>Quantity: {{ $cartItem->getQuantity() }}</td>
-    <x-tipoff-money label="Each" :amount="$cartItem->getAmountEach()->getOriginalAmount()"/>
-    <x-tipoff-money label="Discount" :amount="$cartItem->getAmountEach()->getDiscounts()"/>
-    <x-tipoff-money label="Subtotal" :amount="$cartItem->getAmountTotal()->getDiscountedAmount()"/>
+    <td>{{ $cartItem->getQuantity() }}</td>
+    <td><x-tipoff-money :amount="$cartItem->getAmountEach()->getOriginalAmount()"/></td>
+    <td><x-tipoff-money :amount="$cartItem->getAmountEach()->getDiscounts()"/></td>
+    <td><x-tipoff-money :amount="$cartItem->getAmountTotal()->getDiscountedAmount()"/></td>
 </tr>

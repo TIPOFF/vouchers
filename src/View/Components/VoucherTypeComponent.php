@@ -23,7 +23,7 @@ class VoucherTypeComponent extends Component
     public function render()
     {
         /** @var View $view */
-        $view = view('components.voucher-type');
+        $view = view('vouchers::components.voucher-type');
 
         return $view;
     }

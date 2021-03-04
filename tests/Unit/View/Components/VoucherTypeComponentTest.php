@@ -28,8 +28,6 @@ class VoucherTypeComponentTest extends TestCase
             ['cart' => $cart]
         );
 
-        // TODO - enable after fix to dynamic component in cart component
-        // $view->assertSee("Voucher Type: {$sellable->name}");
-        $view->assertSee('Quantity: 1');
+        $view->assertSee("Voucher Type: {$sellable->name}");
     }
 }

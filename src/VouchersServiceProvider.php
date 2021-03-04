@@ -23,6 +23,7 @@ class VouchersServiceProvider extends TipoffServiceProvider
         // Base configuration
         $package
             ->name('vouchers')
+            ->hasViews()
             ->hasConfigFile();
 
         // Tipoff configuration

@@ -21,7 +21,7 @@ class VoucherComponent extends BaseDeductionComponent
     public function render()
     {
         /** @var View $view */
-        $view = view('components.voucher');
+        $view = view('vouchers::components.voucher');
 
         return $view;
     }

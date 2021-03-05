@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tipoff\Vouchers\Tests\Unit\View\Components\Order;
 
-use Tipoff\Checkout\Models\Cart;
-use Tipoff\Checkout\Models\CartItem;
 use Tipoff\Checkout\Models\Order;
 use Tipoff\Checkout\Models\OrderItem;
 use Tipoff\Vouchers\Models\VoucherType;

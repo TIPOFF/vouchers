@@ -6,7 +6,6 @@ namespace Tipoff\Vouchers\View\Components\Order;
 
 use Illuminate\View\Component;
 use Illuminate\View\View;
-use Tipoff\Checkout\Models\CartItem;
 use Tipoff\Checkout\Models\OrderItem;
 use Tipoff\Vouchers\Models\VoucherType;
 

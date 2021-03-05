@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tipoff\Vouchers\Tests\Unit\View\Components;
+namespace Tipoff\Vouchers\Tests\Unit\View\Components\Cart;
 
 use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\CartItem;

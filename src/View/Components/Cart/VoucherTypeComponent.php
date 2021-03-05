@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tipoff\Vouchers\View\Components;
+namespace Tipoff\Vouchers\View\Components\Cart;
 
 use Illuminate\View\Component;
 use Illuminate\View\View;
@@ -23,7 +23,7 @@ class VoucherTypeComponent extends Component
     public function render()
     {
         /** @var View $view */
-        $view = view('vouchers::components.voucher-type');
+        $view = view('vouchers::components.cart.voucher-type');
 
         return $view;
     }

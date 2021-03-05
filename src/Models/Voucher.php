@@ -253,7 +253,7 @@ class Voucher extends BaseModel implements VoucherInterface
 
     public function getViewComponent($context = null)
     {
-        return 'tipoff-voucher';
+        return implode('-', ['tipoff', 'voucher', $context]);
     }
 
     public function getCode()

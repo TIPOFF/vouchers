@@ -13,8 +13,7 @@ use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Policies\VoucherPolicy;
 use Tipoff\Vouchers\Policies\VoucherTypePolicy;
-use Tipoff\Vouchers\View\Components\VoucherComponent;
-use Tipoff\Vouchers\View\Components\VoucherTypeComponent;
+use Tipoff\Vouchers\View\Components;
 
 class VouchersServiceProvider extends TipoffServiceProvider
 {
@@ -23,6 +22,7 @@ class VouchersServiceProvider extends TipoffServiceProvider
         // Base configuration
         $package
             ->name('vouchers')
+            ->hasViews()
             ->hasConfigFile();
 
         // Tipoff configuration
@@ -44,8 +44,10 @@ class VouchersServiceProvider extends TipoffServiceProvider
                 ],
             ])
             ->hasBladeComponents([
-                'voucher' => VoucherComponent::class,
-                'voucher-type' => VoucherTypeComponent::class,
+                'voucher-cart-deduction' => Components\Cart\VoucherComponent::class,
+                'voucher-type-cart-item' => Components\Cart\VoucherTypeComponent::class,
+                'voucher-order-deduction' => Components\Order\VoucherComponent::class,
+                'voucher-type-order-item' => Components\Order\VoucherTypeComponent::class,
             ])
             ->hasApiRoute('api')
             ->hasCommands([

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tipoff\Vouchers\Tests\Unit\View\Components;
+namespace Tipoff\Vouchers\Tests\Unit\View\Components\Cart;
 
 use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\CartItem;
@@ -28,8 +28,6 @@ class VoucherTypeComponentTest extends TestCase
             ['cart' => $cart]
         );
 
-        // TODO - enable after fix to dynamic component in cart component
-        // $view->assertSee("Voucher Type: {$sellable->name}");
-        $view->assertSee('Quantity: 1');
+        $view->assertSee("Voucher Type: {$sellable->name}");
     }
 }

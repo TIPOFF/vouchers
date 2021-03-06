@@ -97,7 +97,7 @@ class VoucherType extends BaseModel implements Sellable
 
     public function getViewComponent($context = null)
     {
-        return 'tipoff-voucher-type';
+        return implode('-', ['tipoff', 'voucher-type', $context]);
     }
 
     public function getDescription(): string

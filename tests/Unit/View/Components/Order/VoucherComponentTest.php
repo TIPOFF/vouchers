@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tipoff\Vouchers\Tests\Unit\View\Components;
+namespace Tipoff\Vouchers\Tests\Unit\View\Components\Order;
 
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Tests\TestCase;
@@ -15,7 +15,7 @@ class VoucherComponentTest extends TestCase
         $voucher = Voucher::factory()->amount(1234)->create();
 
         $view = $this->blade(
-            '<x-tipoff-cart-deductions :deductions="$deductions" />',
+            '<x-tipoff-order-deductions :deductions="$deductions" />',
             ['deductions' => [
                 $voucher,
             ]]
@@ -32,7 +32,7 @@ class VoucherComponentTest extends TestCase
         $voucher2 = Voucher::factory()->amount(234)->create();
 
         $view = $this->blade(
-            '<x-tipoff-cart-deductions :deductions="$deductions" />',
+            '<x-tipoff-order-deductions :deductions="$deductions" />',
             ['deductions' => [
                 $voucher1,
                 $voucher2,

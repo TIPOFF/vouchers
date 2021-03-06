@@ -19,3 +19,9 @@ All notable changes to `vouchers` will be documented in this file.
 - register policies
 - add nova resources
 - add nova filters
+
+## 2.1.0 - 2021-03-06
+
+- view componenents
+- transformer
+- api routes

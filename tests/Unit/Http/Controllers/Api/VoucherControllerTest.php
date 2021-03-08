@@ -45,9 +45,7 @@ class VoucherControllerTest extends TestCase
         $user = User::factory()->create();
 
         // First customer/user
-        $user = User::factory()->create([
-            'user_id' => $user,
-        ]);
+        $user = User::factory()->create();
         $voucher = Voucher::factory()->create([
             'user_id' => $user,
         ]);

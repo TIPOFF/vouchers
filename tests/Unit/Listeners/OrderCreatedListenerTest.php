@@ -100,7 +100,7 @@ class OrderCreatedListenerTest extends TestCase
         );
 
         $vouchers = Voucher::query()
-            ->where('customer_id', '=', $voucher->getUser()->id)
+            ->where('user_id', '=', $voucher->getUser()->id)
             ->where('voucher_type_id', '=', Voucher::PARTIAL_REDEMPTION_VOUCHER_TYPE_ID)
             ->get();
         $this->assertCount(1, $vouchers);

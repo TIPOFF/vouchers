@@ -17,7 +17,7 @@ class CreateVouchersTable extends Migration
             $table->string('code', 9)->index()->unique();
 
             // Purchase fields
-            $table->foreignIdFor(app('customer'));
+            $table->foreignIdFor(app('user'));
             $table->foreignIdFor(app('location'));
             $table->foreignIdFor(VoucherType::class);
             $table->foreignIdFor(Order::class, 'purchase_order_id')->nullable();

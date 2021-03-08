@@ -55,7 +55,7 @@ class Voucher extends BaseResource
         return array_filter([
             ID::make()->sortable(),
             Text::make('Code')->sortable(),
-            nova('customer') ? BelongsTo::make('Customer', 'customer', nova('customer'))->sortable() : null,
+            nova('user') ? BelongsTo::make('User', 'user', nova('user'))->sortable() : null,
             nova('voucher') ? BelongsTo::make('Voucher Type', 'voucher_type', nova('voucher'))->sortable() : null,
             nova('location') ? BelongsTo::make('Location', 'location', nova('location'))->sortable() : null,
             Date::make('Created At')->sortable(),
@@ -68,7 +68,7 @@ class Voucher extends BaseResource
     {
         return array_filter([
             Text::make('Code')->exceptOnForms(),
-            nova('customer') ? BelongsTo::make('Customer', 'customer', nova('customer'))->searchable()->withSubtitles()->hideWhenUpdating() : null,
+            nova('user') ? BelongsTo::make('User', 'user', nova('user'))->searchable()->withSubtitles()->hideWhenUpdating() : null,
             nova('vouchertype') ? BelongsTo::make('Voucher Type', 'voucher_type', nova('vouchertype'))->hideWhenUpdating() : null,
             nova('location') ? BelongsTo::make('Location', 'location', nova('location'))->hideWhenUpdating() : null,
             nova('order') ? BelongsTo::make('Purchase Order', 'purchaseOrder', nova('order'))->exceptOnForms() : null,

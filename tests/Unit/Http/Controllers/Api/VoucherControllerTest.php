@@ -30,7 +30,7 @@ class VoucherControllerTest extends TestCase
             'user_id' => $user,
         ]);
 
-//        $this->actingAs($customer->user);
+        $this->actingAs($user);
 
         $response = $this->getJson('tipoff/vouchers')
             ->assertOk();

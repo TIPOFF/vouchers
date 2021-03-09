@@ -6,7 +6,6 @@ namespace Tipoff\Vouchers\Tests\Unit\Http\Controllers\Api;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Symfony\Component\HttpFoundation\Response;
-//use Tipoff\Addresses\Models\Customer;
 use Tipoff\Authorization\Models\User;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Tests\TestCase;
@@ -24,7 +23,7 @@ class VoucherControllerTest extends TestCase
             'user_id' => $user,
         ]);
 
-        // Second user/user
+        // Second user
         $user = User::factory()->create();
         Voucher::factory()->count(4)->create([
             'user_id' => $user,
@@ -42,9 +41,6 @@ class VoucherControllerTest extends TestCase
     public function show_voucher_i_own()
     {
         /** @var User $user */
-        $user = User::factory()->create();
-
-        // First customer/user
         $user = User::factory()->create();
         $voucher = Voucher::factory()->create([
             'user_id' => $user,
@@ -64,9 +60,6 @@ class VoucherControllerTest extends TestCase
     {
         /** @var User $user */
         $user = User::factory()->create();
-
-        // First customer/user
-        $user = User::factory()->create();
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()->create([
             'user_id' => $user,
@@ -85,13 +78,12 @@ class VoucherControllerTest extends TestCase
     /** @test */
     public function show_voucher_i_dont_own()
     {
-        // First customer/user
         $user = User::factory()->create();
         $voucher = Voucher::factory()->create([
             'user_id' => $user,
         ]);
 
-        $user = self::createPermissionedUser('view vouchers', false);
+        $user = User::factory()->create();
         $this->actingAs($user);
 
         $this->getJson("tipoff/vouchers/{$voucher->id}")

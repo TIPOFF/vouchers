@@ -52,7 +52,7 @@ class OrderCreatedListener
             $voucher->expires_at = $vouchers->min->expires_at;
             $voucher->redeemable_at = Carbon::now();
             $voucher->purchase_order_id = $order->getId();
-            $voucher->customer_id = $voucher->creator_id = $voucher->updater_id = $user->id;
+            $voucher->user_id = $voucher->creator_id = $voucher->updater_id = $user->id;
             $voucher->save();
 
             $user->notify(new PartialRedemptionVoucherCreated($voucher));

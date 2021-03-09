@@ -34,7 +34,7 @@ class VoucherFactory extends Factory
 
         return [
             'code'              => $this->faker->md5,
-            'customer_id'       => randomOrCreate(app('customer')),
+            'user_id'       => randomOrCreate(app('user')),
             'location_id'       => randomOrCreate(app('location')),
             'voucher_type_id'   => randomOrCreate(VoucherType::class),
             'purchase_order_id' => randomOrCreate(app('order')),

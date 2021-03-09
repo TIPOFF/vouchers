@@ -40,7 +40,7 @@ use Tipoff\Vouchers\Transformers\VoucherTransformer;
  * @property int voucher_type_id
  * @property int order_id
  * @property int purchase_order_id
- * @property int customer_id
+ * @property int user_id
  * @property int location_id
  * @property int creator_id
  * @property int updater_id
@@ -66,7 +66,7 @@ class Voucher extends BaseModel implements VoucherInterface
         'voucher_type_id' => 'integer',
         'order_id' => 'integer',
         'purchase_order_id' => 'integer',
-        'customer_id' => 'integer',
+        'user_id' => 'integer',
         'location_id' => 'integer',
         'creator_id' => 'integer',
         'updater_id' => 'integer',
@@ -105,9 +105,9 @@ class Voucher extends BaseModel implements VoucherInterface
         return $this->belongsTo(Order::class, 'order_id');
     }
 
-    public function customer()
+    public function user()
     {
-        return $this->belongsTo(app('customer'));
+        return $this->belongsTo(app('user'));
     }
 
     public function location()
@@ -131,7 +131,7 @@ class Voucher extends BaseModel implements VoucherInterface
 
     public function scopeByUser(Builder $query, $user): Builder
     {
-        return $query->whereHas('customer', function ($q) use ($user) {
+        return $query->whereHas('user', function ($q) use ($user) {
             $q->where('user_id', $user->id ?? 0);
         });
     }
@@ -210,9 +210,9 @@ class Voucher extends BaseModel implements VoucherInterface
         // TODO - change to model interface -
         // $customer = findModel(CustomerInterface::class, $this->customer_id);
         // return $customer ? $customer->getUser() : null;
-        $customer = $this->customer;
+        $user = $this->user;
 
-        return $customer ? $customer->user : null;
+        return $user ?? null;
     }
 
     public static function generateVoucherCode(): string

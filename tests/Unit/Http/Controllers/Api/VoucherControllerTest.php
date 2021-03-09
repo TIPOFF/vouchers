@@ -6,7 +6,7 @@ namespace Tipoff\Vouchers\Tests\Unit\Http\Controllers\Api;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Symfony\Component\HttpFoundation\Response;
-use Tipoff\Addresses\Models\Customer;
+//use Tipoff\Addresses\Models\Customer;
 use Tipoff\Authorization\Models\User;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Tests\TestCase;
@@ -18,23 +18,19 @@ class VoucherControllerTest extends TestCase
     /** @test */
     public function index()
     {
-        // First customer/user
-        $customer = Customer::factory()->create([
-            'user_id' => User::factory()->create(),
-        ]);
+        // First user
+        $user = User::factory()->create();
         Voucher::factory()->count(4)->create([
-            'customer_id' => $customer,
+            'user_id' => $user,
         ]);
 
-        // Second customer/user
-        $customer = Customer::factory()->create([
-            'user_id' => User::factory()->create(),
-        ]);
+        // Second user/user
+        $user = User::factory()->create();
         Voucher::factory()->count(4)->create([
-            'customer_id' => $customer,
+            'user_id' => $user,
         ]);
 
-        $this->actingAs($customer->user);
+        $this->actingAs($user);
 
         $response = $this->getJson('tipoff/vouchers')
             ->assertOk();
@@ -49,11 +45,9 @@ class VoucherControllerTest extends TestCase
         $user = User::factory()->create();
 
         // First customer/user
-        $customer = Customer::factory()->create([
-            'user_id' => $user,
-        ]);
+        $user = User::factory()->create();
         $voucher = Voucher::factory()->create([
-            'customer_id' => $customer,
+            'user_id' => $user,
         ]);
 
         $this->actingAs($user);
@@ -72,12 +66,10 @@ class VoucherControllerTest extends TestCase
         $user = User::factory()->create();
 
         // First customer/user
-        $customer = Customer::factory()->create([
-            'user_id' => $user,
-        ]);
+        $user = User::factory()->create();
         /** @var Voucher $voucher */
         $voucher = Voucher::factory()->create([
-            'customer_id' => $customer,
+            'user_id' => $user,
         ]);
 
         $this->actingAs($user);
@@ -94,9 +86,9 @@ class VoucherControllerTest extends TestCase
     public function show_voucher_i_dont_own()
     {
         // First customer/user
-        $customer = Customer::factory()->create();
+        $user = User::factory()->create();
         $voucher = Voucher::factory()->create([
-            'customer_id' => $customer,
+            'user_id' => $user,
         ]);
 
         $user = self::createPermissionedUser('view vouchers', false);

@@ -25,3 +25,8 @@ All notable changes to `vouchers` will be documented in this file.
 - view componenents
 - transformer
 - api routes
+
+## 2.2.0 - 2021-03-09
+
+- change migration
+- replace customer relationship with user

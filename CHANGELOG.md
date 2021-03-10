@@ -30,3 +30,9 @@ All notable changes to `vouchers` will be documented in this file.
 
 - change migration
 - replace customer relationship with user
+
+## 2.2.1 - 2021-03-10
+
+- scope user request with visible by
+- migrate permissions
+- grant permissions to roles

@@ -13,7 +13,7 @@ use Tipoff\Checkout\CheckoutServiceProvider;
 use Tipoff\Locations\LocationsServiceProvider;
 use Tipoff\Support\SupportServiceProvider;
 use Tipoff\TestSupport\BaseTestCase;
-use Tipoff\Vouchers\Tests\Support\Providers\NovaPackageServiceProvider;
+use Tipoff\TestSupport\Providers\NovaPackageServiceProvider;
 use Tipoff\Vouchers\VouchersServiceProvider;
 
 class TestCase extends BaseTestCase

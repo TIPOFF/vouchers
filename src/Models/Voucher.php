@@ -129,11 +129,9 @@ class Voucher extends BaseModel implements VoucherInterface
 
     //region SCOPES
 
-    public function scopeByUser(Builder $query, $user): Builder
+    public function scopeVisibleBy(Builder $query, UserInterface $user): Builder
     {
-        return $query->whereHas('user', function ($q) use ($user) {
-            $q->where('user_id', $user->id ?? 0);
-        });
+        return $query->where('user_id', '=', $user->getId());
     }
 
     public function scopeValidAt(Builder $query, $date): Builder
@@ -207,12 +205,7 @@ class Voucher extends BaseModel implements VoucherInterface
 
     public function getUser()
     {
-        // TODO - change to model interface -
-        // $customer = findModel(CustomerInterface::class, $this->customer_id);
-        // return $customer ? $customer->getUser() : null;
-        $user = $this->user;
-
-        return $user ?? null;
+        return $this->user;
     }
 
     public static function generateVoucherCode(): string

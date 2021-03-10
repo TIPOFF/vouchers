@@ -24,7 +24,7 @@ class VoucherController extends BaseApiController
 
     public function index(IndexRequest $request): JsonResponse
     {
-        $vouchers = Voucher::query()->byUser($request->user())->paginate($request->getPageSize());
+        $vouchers = Voucher::query()->visibleBy($request->user())->paginate($request->getPageSize());
 
         return fractal($vouchers, $this->transformer)
             ->respond();

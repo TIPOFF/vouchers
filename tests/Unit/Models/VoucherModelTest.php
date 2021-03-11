@@ -101,7 +101,7 @@ class VoucherModelTest extends TestCase
         ]);
 
         $this->assertNotNull($voucher->expires_at);
-        $this->assertEquals(VoucherType::DEFAULT_EXPIRATION_DAYS, Carbon::now()->diffInDays($voucher->expires_at));
+        $this->assertEquals(config('vouchers.default_expiration_days'), Carbon::now()->diffInDays($voucher->expires_at));
     }
 
     /** @test */
@@ -117,7 +117,7 @@ class VoucherModelTest extends TestCase
             ]);
 
             $this->assertNotNull($voucher->redeemable_at);
-            $this->assertEquals(Voucher::DEFAULT_REDEEMABLE_HOURS, Carbon::now()->diffInHours($voucher->redeemable_at));
+            $this->assertEquals(config('vouchers.default_redeemable_hours'), Carbon::now()->diffInHours($voucher->redeemable_at));
         } finally {
             Carbon::setTestNow(null);
         }

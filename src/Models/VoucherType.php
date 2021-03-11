@@ -39,8 +39,6 @@ class VoucherType extends BaseModel implements Sellable
     use HasUpdater;
     use SoftDeletes;
 
-    const DEFAULT_EXPIRATION_DAYS = 365;
-
     protected $casts = [
         'id' => 'integer',
         'is_sellable' => 'boolean',
@@ -57,7 +55,7 @@ class VoucherType extends BaseModel implements Sellable
         parent::boot();
 
         static::saving(function (VoucherType $vouchertype) {
-            $vouchertype->expiration_days = $vouchertype->expiration_days ?: self::DEFAULT_EXPIRATION_DAYS;
+            $vouchertype->expiration_days = $vouchertype->expiration_days ?: (config('vouchers.default_expiration_days') ?? 365);
 
             Assert::lazy()
                 ->that(! empty($vouchertype->amount) && ! empty($vouchertype->participants), 'amount')->false('A voucher cannot have both an amount & number of participants.')

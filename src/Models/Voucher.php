@@ -62,8 +62,6 @@ class Voucher extends BaseModel implements VoucherInterface
      */
     const PARTIAL_REDEMPTION_VOUCHER_TYPE_ID = 7;
 
-    const DEFAULT_REDEEMABLE_HOURS = 24;
-
     protected $casts = [
         'id' => 'integer',
         'amount' => 'integer',
@@ -85,7 +83,7 @@ class Voucher extends BaseModel implements VoucherInterface
 
         static::saving(function (Voucher $voucher) {
             $voucher->expires_at = $voucher->expires_at ?: Carbon::parse($voucher->created_at)->addDays($voucher->voucher_type->expiration_days);
-            $voucher->redeemable_at = $voucher->redeemable_at ?: Carbon::now()->addHours(self::DEFAULT_REDEEMABLE_HOURS);
+            $voucher->redeemable_at = $voucher->redeemable_at ?: Carbon::now()->addHours(config('vouchers.default_redeemable_hours') ?? 24);
             $voucher->code = strtoupper($voucher->code ?: static::generateVoucherCode());
 
             Assert::lazy()

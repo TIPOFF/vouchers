@@ -37,7 +37,6 @@ class OrderItemCreatedListener
         $voucher->voucher_type_id = $voucherType->id;
         $voucher->location_id = $order->getLocationId();
         $voucher->expires_at = Carbon::now()->addDays($voucherType->expiration_days);
-        $voucher->redeemable_at = Carbon::now();    // TODO - are new vouchers redeemable immediately?
         $voucher->purchase_order_id = $order->getId();
         $voucher->user_id = $voucher->creator_id = $voucher->updater_id = $user->id;
         $voucher->save();

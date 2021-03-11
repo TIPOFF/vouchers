@@ -6,7 +6,6 @@ namespace Tipoff\Vouchers\Listeners;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Tipoff\Addresses\Models\Address;
 use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\Order;
 use Tipoff\Support\Events\Checkout\OrderCreated;

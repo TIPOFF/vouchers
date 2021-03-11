@@ -13,7 +13,6 @@ use Tipoff\Checkout\Models\Cart;
 use Tipoff\Vouchers\Exceptions\UnsupportedVoucherTypeException;
 use Tipoff\Vouchers\Exceptions\VoucherRedeemedException;
 use Tipoff\Vouchers\Models\Voucher;
-use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Tests\TestCase;
 
 class VoucherModelTest extends TestCase

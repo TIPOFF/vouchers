@@ -58,23 +58,11 @@ class OrderCreatedListener
 
             /** @var Voucher $sourceVoucher */
             $sourceVoucher = $vouchers->first();
-            static::copyVoucherAddressesToTarget($sourceVoucher, $voucher);
+            $sourceVoucher->copyAddressesToTarget($voucher);
 
             $user->notify(new PartialRedemptionVoucherCreated($voucher));
         }
 
         return $this;
-    }
-
-    private static function copyVoucherAddressesToTarget(Voucher $source, Voucher $target)
-    {
-        // TODO - replace with method in `HasAddresses` trait when available
-        // $sourceVoucher->copyAddressesToTarget($voucher);
-        $source->addresses
-            ->each(function (Address $sourceAddress) use ($target) {
-                // Create a copy, replacing the addressable with the target before saving
-                $targetAddress = $sourceAddress->replicate();
-                $targetAddress->addressable()->associate($target)->save();
-            });
     }
 }

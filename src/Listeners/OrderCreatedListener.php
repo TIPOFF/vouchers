@@ -6,6 +6,7 @@ namespace Tipoff\Vouchers\Listeners;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Tipoff\Addresses\Models\Address;
 use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\Order;
 use Tipoff\Support\Events\Checkout\OrderCreated;
@@ -55,9 +56,25 @@ class OrderCreatedListener
             $voucher->user_id = $voucher->creator_id = $voucher->updater_id = $user->id;
             $voucher->save();
 
+            /** @var Voucher $sourceVoucher */
+            $sourceVoucher = $vouchers->first();
+            static::copyVoucherAddressesToTarget($sourceVoucher, $voucher);
+
             $user->notify(new PartialRedemptionVoucherCreated($voucher));
         }
 
         return $this;
+    }
+
+    private static function copyVoucherAddressesToTarget(Voucher $source, Voucher $target)
+    {
+        // TODO - replace with method in `HasAddresses` trait when available
+        // $sourceVoucher->copyAddressesToTarget($voucher);
+        $source->addresses
+            ->each(function (Address $sourceAddress) use ($target) {
+                // Create a copy, replacing the addressable with the target before saving
+                $targetAddress = $sourceAddress->replicate();
+                $targetAddress->addressable()->associate($target)->save();
+            });
     }
 }

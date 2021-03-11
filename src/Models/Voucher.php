@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Tipoff\Addresses\Traits\HasAddresses;
 use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\Order;
 use Tipoff\Support\Contracts\Checkout\CartInterface;
@@ -31,6 +32,8 @@ use Tipoff\Vouchers\Transformers\VoucherTransformer;
  * @property int amount
  * @property int participants
  * @property VoucherType voucher_type
+ * @property Order purchaseOrder
+ * @property Order redemptionOrder
  * @property Carbon redeemable_at
  * @property Carbon redeemed_at
  * @property Carbon expires_at
@@ -51,8 +54,12 @@ class Voucher extends BaseModel implements VoucherInterface
     use HasCreator;
     use HasUpdater;
     use SoftDeletes;
+    use HasAddresses;
 
-    /** Voucher type used in partial redemptions. */
+    /**
+     * Voucher type used in partial redemptions.
+     * TODO - eliminate this hard code dependency
+     */
     const PARTIAL_REDEMPTION_VOUCHER_TYPE_ID = 7;
 
     const DEFAULT_REDEEMABLE_HOURS = 24;
@@ -96,11 +103,6 @@ class Voucher extends BaseModel implements VoucherInterface
     }
 
     public function redemptionOrder()
-    {
-        return $this->belongsTo(Order::class, 'order_id');
-    }
-
-    public function order()
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
@@ -197,7 +199,7 @@ class Voucher extends BaseModel implements VoucherInterface
     {
         $this->redeemed_at = Carbon::now();
         if ($order) {
-            $this->order()->associate($order);
+            $this->redemptionOrder()->associate($order);
         }
 
         return $this;

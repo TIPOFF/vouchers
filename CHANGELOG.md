@@ -36,3 +36,8 @@ All notable changes to `vouchers` will be documented in this file.
 - scope user request with visible by
 - migrate permissions
 - grant permissions to roles
+
+## 2.2.2 - 2021-03-12
+
+- implement addresses
+- nova resource group

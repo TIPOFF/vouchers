@@ -28,7 +28,7 @@ class VoucherType extends BaseResource
         'title',
     ];
 
-    public static $group = 'Operations Units';
+    public static $group = 'Z - Admin';
 
     /** @psalm-suppress UndefinedClass */
     protected array $filterClassList = [

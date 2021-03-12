@@ -19,6 +19,15 @@ You can publish the config file with:
 php artisan vendor:publish --provider="Tipoff\Vouchers\VouchersServiceProvider" --tag="vouchers-config"
 ```
 
+This is the contents of the published config file:
+
+```php
+return [
+    'default_redeemable_hours' => 24,
+    'default_expiration_days' => 365,
+];
+```
+
 #### Registering the Nova resources
 
 If you would like to use the Nova resources included with this package, you need to register it manually in your `NovaServiceProvider` in the `boot` method.

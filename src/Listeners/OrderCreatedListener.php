@@ -55,6 +55,10 @@ class OrderCreatedListener
             $voucher->user_id = $voucher->creator_id = $voucher->updater_id = $user->id;
             $voucher->save();
 
+            /** @var Voucher $sourceVoucher */
+            $sourceVoucher = $vouchers->first();
+            $sourceVoucher->copyAddressesToTarget($voucher);
+
             $user->notify(new PartialRedemptionVoucherCreated($voucher));
         }
 

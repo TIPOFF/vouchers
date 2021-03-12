@@ -74,7 +74,7 @@ class VoucherTypeModelTest extends TestCase
             'expiration_days' => null,
         ]);
 
-        $this->assertEquals(VoucherType::DEFAULT_EXPIRATION_DAYS, $voucherType->expiration_days);
+        $this->assertEquals(config('vouchers.default_expiration_days'), $voucherType->expiration_days);
     }
 
     /** @test */

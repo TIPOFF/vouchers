@@ -9,12 +9,12 @@ class AddVoucherPermissions extends BasePermissionsMigration
     public function up()
     {
         $permissions = [
-            'view vouchers' => ['Owner', 'Staff'],
-            'create vouchers' => ['Owner'],
-            'update vouchers' => ['Owner'],
-            'view voucher types' => ['Owner', 'Staff'],
-            'create voucher types' => ['Owner'],
-            'update voucher types' => ['Owner'],
+            'view vouchers' => ['Owner', 'Executive', 'Staff'],
+            'create vouchers' => ['Owner', 'Executive'],
+            'update vouchers' => ['Owner', 'Executive'],
+            'view voucher types' => ['Owner', 'Executive', 'Staff'],
+            'create voucher types' => ['Owner', 'Executive'],
+            'update voucher types' => ['Owner', 'Executive'],
             'delete voucher types' => []
         ];
 

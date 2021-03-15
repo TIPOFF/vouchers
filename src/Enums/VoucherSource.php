@@ -14,7 +14,7 @@ use Tipoff\Support\Enums\BaseEnum;
  */
 class VoucherSource extends BaseEnum
 {
-    const REFUND             = 'refund';
+    const REFUND = 'refund';
     const PARTIAL_REDEMPTION = 'partial_redemption';
-    const PURCHASE           = 'purchase';
+    const PURCHASE = 'purchase';
 }

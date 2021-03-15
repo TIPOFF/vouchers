@@ -88,7 +88,7 @@ class Voucher extends BaseModel implements VoucherInterface
 
             Assert::lazy()
                 ->that(empty($voucher->amount) && empty($voucher->participants), 'amount')->false('A voucher must have either an amount or number of participants.')
-                ->that(!empty($voucher->amount) && !empty($voucher->participants), 'amount')->false('A voucher cannot have both an amount & number of participants.')
+                ->that(! empty($voucher->amount) && ! empty($voucher->participants), 'amount')->false('A voucher cannot have both an amount & number of participants.')
                 ->verifyNow();
         });
     }
@@ -169,7 +169,7 @@ class Voucher extends BaseModel implements VoucherInterface
      */
     public function isValidAt($date): bool
     {
-        if (!$date instanceof Carbon) {
+        if (! $date instanceof Carbon) {
             $date = new Carbon($date);
         }
 
@@ -181,7 +181,7 @@ class Voucher extends BaseModel implements VoucherInterface
             return false;
         }
 
-        if (!empty($this->redeemed_at)) {
+        if (! empty($this->redeemed_at)) {
             return false;
         }
 

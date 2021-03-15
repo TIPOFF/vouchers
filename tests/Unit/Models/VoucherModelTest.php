@@ -385,7 +385,7 @@ class VoucherModelTest extends TestCase
         $voucher = Voucher::createRefundVoucher(123, $user, 1000);
         $this->assertEquals(VoucherSource::REFUND, $voucher->source->getValue());
         $this->assertEquals(1000, $voucher->amount);
-        $this->assertNull( $voucher->participants);
+        $this->assertNull($voucher->participants);
         $this->assertEquals($user->id, $voucher->user_id);
     }
 }

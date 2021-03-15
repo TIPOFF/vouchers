@@ -32,6 +32,6 @@ class VoucherTransformer extends BaseTransformer
 
     public function includeVoucherType(Voucher $voucher)
     {
-        return $this->item($voucher->voucher_type, new VoucherTypeTransformer());
+        return $voucher->voucher_type ? $this->item($voucher->voucher_type, new VoucherTypeTransformer()) : null;
     }
 }

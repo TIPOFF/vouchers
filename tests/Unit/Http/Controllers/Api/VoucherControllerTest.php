@@ -7,6 +7,7 @@ namespace Tipoff\Vouchers\Tests\Unit\Http\Controllers\Api;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Symfony\Component\HttpFoundation\Response;
 use Tipoff\Authorization\Models\User;
+use Tipoff\Vouchers\Enums\VoucherSource;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Tests\TestCase;
 
@@ -61,7 +62,7 @@ class VoucherControllerTest extends TestCase
         /** @var User $user */
         $user = User::factory()->create();
         /** @var Voucher $voucher */
-        $voucher = Voucher::factory()->create([
+        $voucher = Voucher::factory()->source(VoucherSource::PURCHASE())->create([
             'user_id' => $user,
         ]);
 

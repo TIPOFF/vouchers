@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Notification;
 use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\Order;
 use Tipoff\Support\Events\Checkout\OrderCreated;
+use Tipoff\Vouchers\Enums\VoucherSource;
 use Tipoff\Vouchers\Listeners\OrderCreatedListener;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Notifications\PartialRedemptionVoucherCreated;
@@ -84,7 +85,7 @@ class OrderCreatedListenerTest extends TestCase
         ]);
 
         /** @var Voucher $voucher */
-        $voucher = Voucher::factory()->expired(false)->amount(1000)->create();
+        $voucher = Voucher::factory()->expired(false)->amount(1000)->source(VoucherSource::PURCHASE())->create();
 
         /** @var Cart $cart */
         $cart = Cart::factory()->create();
@@ -101,7 +102,7 @@ class OrderCreatedListenerTest extends TestCase
 
         $vouchers = Voucher::query()
             ->where('user_id', '=', $voucher->getUser()->id)
-            ->where('voucher_type_id', '=', Voucher::PARTIAL_REDEMPTION_VOUCHER_TYPE_ID)
+            ->where('source', '=', VoucherSource::PARTIAL_REDEMPTION)
             ->get();
         $this->assertCount(1, $vouchers);
 

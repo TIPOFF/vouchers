@@ -14,6 +14,8 @@ use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
 use Tipoff\Support\Nova\BaseResource;
+use Tipoff\Support\Nova\Fields\Enum;
+use Tipoff\Vouchers\Enums\VoucherSource;
 
 class Voucher extends BaseResource
 {
@@ -56,6 +58,7 @@ class Voucher extends BaseResource
             ID::make()->sortable(),
             Text::make('Code')->sortable(),
             nova('user') ? BelongsTo::make('User', 'user', nova('user'))->sortable() : null,
+            Enum::make('Source', 'source')->attach(VoucherSource::class),
             nova('voucher') ? BelongsTo::make('Voucher Type', 'voucher_type', nova('voucher'))->sortable() : null,
             nova('location') ? BelongsTo::make('Location', 'location', nova('location'))->sortable() : null,
             Date::make('Created At')->sortable(),
@@ -69,6 +72,7 @@ class Voucher extends BaseResource
         return array_filter([
             Text::make('Code')->exceptOnForms(),
             nova('user') ? BelongsTo::make('User', 'user', nova('user'))->searchable()->withSubtitles()->hideWhenUpdating() : null,
+            Enum::make('Source', 'source')->attach(VoucherSource::class),
             nova('vouchertype') ? BelongsTo::make('Voucher Type', 'voucher_type', nova('vouchertype'))->hideWhenUpdating() : null,
             nova('location') ? BelongsTo::make('Location', 'location', nova('location'))->hideWhenUpdating() : null,
             nova('order') ? BelongsTo::make('Purchase Order', 'purchaseOrder', nova('order'))->exceptOnForms() : null,

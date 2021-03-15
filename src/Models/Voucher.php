@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Tipoff\Addresses\Traits\HasAddresses;
 use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\Order;
+use Tipoff\Support\Casts\Enum;
 use Tipoff\Support\Contracts\Checkout\CartInterface;
 use Tipoff\Support\Contracts\Checkout\CodedCartAdjustment;
 use Tipoff\Support\Contracts\Checkout\OrderInterface;
@@ -21,6 +22,7 @@ use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
 use Tipoff\Support\Traits\HasUpdater;
+use Tipoff\Vouchers\Enums\VoucherSource;
 use Tipoff\Vouchers\Exceptions\UnsupportedVoucherTypeException;
 use Tipoff\Vouchers\Exceptions\VoucherRedeemedException;
 use Tipoff\Vouchers\Services\Voucher\CalculateAdjustments;
@@ -29,20 +31,21 @@ use Tipoff\Vouchers\Transformers\VoucherTransformer;
 /**
  * @property int id
  * @property string code
- * @property int amount
- * @property int participants
- * @property VoucherType voucher_type
- * @property Order purchaseOrder
- * @property Order redemptionOrder
+ * @property int|null amount
+ * @property int|null participants
+ * @property VoucherSource source
+ * @property VoucherType|null voucher_type
+ * @property Order|null purchaseOrder
+ * @property Order|null redemptionOrder
  * @property Carbon redeemable_at
- * @property Carbon redeemed_at
- * @property Carbon expires_at
+ * @property Carbon|null redeemed_at
+ * @property Carbon|null expires_at
  * @property Carbon created_at
  * @property Carbon updated_at
  * // Raw Relations
- * @property int voucher_type_id
- * @property int order_id
- * @property int purchase_order_id
+ * @property int|null voucher_type_id
+ * @property int|null order_id
+ * @property int|null purchase_order_id
  * @property int user_id
  * @property int location_id
  * @property int creator_id
@@ -56,14 +59,9 @@ class Voucher extends BaseModel implements VoucherInterface
     use SoftDeletes;
     use HasAddresses;
 
-    /**
-     * Voucher type used in partial redemptions.
-     * TODO - eliminate this hard code dependency
-     */
-    const PARTIAL_REDEMPTION_VOUCHER_TYPE_ID = 7;
-
     protected $casts = [
         'id' => 'integer',
+        'source' => Enum::class . ':' . VoucherSource::class,
         'amount' => 'integer',
         'participants' => 'integer',
         'redeemed_at' => 'datetime',
@@ -82,13 +80,15 @@ class Voucher extends BaseModel implements VoucherInterface
         parent::boot();
 
         static::saving(function (Voucher $voucher) {
-            $voucher->expires_at = $voucher->expires_at ?: Carbon::parse($voucher->created_at)->addDays($voucher->voucher_type->expiration_days);
+            $voucher->expires_at = $voucher->expires_at ?: Carbon::parse($voucher->created_at)->addDays(
+                $voucher->voucher_type ? $voucher->voucher_type->expiration_days : (config('vouchers.default_expiration_days') ?? 365)
+            );
             $voucher->redeemable_at = $voucher->redeemable_at ?: Carbon::now()->addHours(config('vouchers.default_redeemable_hours') ?? 24);
             $voucher->code = strtoupper($voucher->code ?: static::generateVoucherCode());
 
             Assert::lazy()
                 ->that(empty($voucher->amount) && empty($voucher->participants), 'amount')->false('A voucher must have either an amount or number of participants.')
-                ->that(! empty($voucher->amount) && ! empty($voucher->participants), 'amount')->false('A voucher cannot have both an amount & number of participants.')
+                ->that(!empty($voucher->amount) && !empty($voucher->participants), 'amount')->false('A voucher cannot have both an amount & number of participants.')
                 ->verifyNow();
         });
     }
@@ -169,7 +169,7 @@ class Voucher extends BaseModel implements VoucherInterface
      */
     public function isValidAt($date): bool
     {
-        if (! $date instanceof Carbon) {
+        if (!$date instanceof Carbon) {
             $date = new Carbon($date);
         }
 
@@ -181,7 +181,7 @@ class Voucher extends BaseModel implements VoucherInterface
             return false;
         }
 
-        if (! empty($this->redeemed_at)) {
+        if (!empty($this->redeemed_at)) {
             return false;
         }
 
@@ -211,7 +211,7 @@ class Voucher extends BaseModel implements VoucherInterface
     public static function generateVoucherCode(): string
     {
         do {
-            $code = Carbon::now('America/New_York')->format('ymd').Str::upper(Str::random(3));
+            $code = Carbon::now('America/New_York')->format('ymd') . Str::upper(Str::random(3));
         } while (Voucher::where('code', $code)->count());
 
         return $code;
@@ -237,6 +237,19 @@ class Voucher extends BaseModel implements VoucherInterface
     public static function getCodesForOrder(OrderInterface $order): array
     {
         return Voucher::query()->byOrderId($order->getId())->get()->all();
+    }
+
+    public static function createRefundVoucher(int $locationId, UserInterface $user, int $amount): self
+    {
+        $voucher = new static();
+        $voucher->source = VoucherSource::REFUND();
+        $voucher->location_id = $locationId;
+        $voucher->user_id = $user->getId();
+        $voucher->amount = $amount;
+        $voucher->redeemable_at = Carbon::now();
+        $voucher->save();
+
+        return $voucher;
     }
 
     public function getTransformer($context = null)

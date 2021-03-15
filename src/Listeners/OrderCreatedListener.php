@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Tipoff\Checkout\Models\Cart;
 use Tipoff\Checkout\Models\Order;
 use Tipoff\Support\Events\Checkout\OrderCreated;
+use Tipoff\Vouchers\Enums\VoucherSource;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Notifications\PartialRedemptionVoucherCreated;
 
@@ -47,7 +48,7 @@ class OrderCreatedListener
 
             $voucher = new Voucher;
             $voucher->amount = $unusedVoucherAmount;
-            $voucher->voucher_type_id = Voucher::PARTIAL_REDEMPTION_VOUCHER_TYPE_ID;
+            $voucher->source = VoucherSource::PARTIAL_REDEMPTION();
             $voucher->location_id = $order->getLocationId();
             $voucher->expires_at = $vouchers->min->expires_at;
             $voucher->redeemable_at = Carbon::now();

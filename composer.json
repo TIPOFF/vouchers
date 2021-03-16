@@ -16,10 +16,10 @@
     ],
     "require": {
         "php": "^7.4|^8.0",
-        "tipoff/addresses": "^2.4.3",
-        "tipoff/authorization": "^2.5.4",
-        "tipoff/checkout": "^2.4.2",
-        "tipoff/support": "^1.6.2"
+        "tipoff/addresses": "^2.5.0",
+        "tipoff/authorization": "^2.5.5",
+        "tipoff/checkout": "^2.5.0",
+        "tipoff/support": "^1.6.5"
     },
     "require-dev": {
         "tipoff/test-support": "^1.2.0"

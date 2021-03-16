@@ -41,3 +41,7 @@ All notable changes to `vouchers` will be documented in this file.
 
 - implement addresses
 - nova resource group
+
+## 2.3.0 - 2021-03-16
+
+- amend vouchers migration

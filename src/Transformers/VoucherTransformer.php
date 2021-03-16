@@ -20,7 +20,8 @@ class VoucherTransformer extends BaseTransformer
     {
         return [
             'id' => $voucher->id,
-            'name' => $voucher->voucher_type->name,
+            'source' => $voucher->source->getValue(),
+            'name' => $voucher->voucher_type ? $voucher->voucher_type->name : null,
             'code' => $voucher->code,
             'amount' => $voucher->amount,
             'participants' => $voucher->participants,
@@ -31,6 +32,6 @@ class VoucherTransformer extends BaseTransformer
 
     public function includeVoucherType(Voucher $voucher)
     {
-        return $this->item($voucher->voucher_type, new VoucherTypeTransformer());
+        return $voucher->voucher_type ? $this->item($voucher->voucher_type, new VoucherTypeTransformer()) : null;
     }
 }

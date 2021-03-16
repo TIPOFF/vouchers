@@ -19,7 +19,8 @@ class CreateVouchersTable extends Migration
             // Purchase fields
             $table->foreignIdFor(app('user'));
             $table->foreignIdFor(app('location'));
-            $table->foreignIdFor(VoucherType::class);
+            $table->string('source');
+            $table->foreignIdFor(VoucherType::class)->nullable();
             $table->foreignIdFor(Order::class, 'purchase_order_id')->nullable();
 
             // Redemption fields

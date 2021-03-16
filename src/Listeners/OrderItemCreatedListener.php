@@ -7,6 +7,7 @@ namespace Tipoff\Vouchers\Listeners;
 use Carbon\Carbon;
 use Tipoff\Checkout\Models\OrderItem;
 use Tipoff\Support\Events\Checkout\OrderItemCreated;
+use Tipoff\Vouchers\Enums\VoucherSource;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Notifications\VoucherCreated;
@@ -32,6 +33,7 @@ class OrderItemCreatedListener
         $user = $orderItem->order->user;
 
         $voucher = new Voucher;
+        $voucher->source = VoucherSource::PURCHASE();
         $voucher->amount = $voucherType->amount;
         $voucher->participants = $voucherType->participants;
         $voucher->voucher_type_id = $voucherType->id;

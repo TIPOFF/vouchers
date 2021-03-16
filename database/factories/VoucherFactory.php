@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Tipoff\Vouchers\Enums\VoucherSource;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 
@@ -32,11 +33,14 @@ class VoucherFactory extends Factory
             $participants = $this->faker->numberBetween(1, 10);
         }
 
+        $source = $this->faker->randomElement(VoucherSource::getEnumerators());
+
         return [
             'code'              => $this->faker->md5,
-            'user_id'       => randomOrCreate(app('user')),
+            'user_id'           => randomOrCreate(app('user')),
             'location_id'       => randomOrCreate(app('location')),
-            'voucher_type_id'   => randomOrCreate(VoucherType::class),
+            'source'            => $source,
+            'voucher_type_id'   => $source->is(VoucherSource::PURCHASE()) ? randomOrCreate(VoucherType::class) : null,
             'purchase_order_id' => randomOrCreate(app('order')),
             'order_id'          => randomOrCreate(app('order')),
             'amount'            => $amount,
@@ -108,4 +112,13 @@ class VoucherFactory extends Factory
         });
     }
 
+    public function source(VoucherSource $source): self
+    {
+        return $this->state(function (array $attributes) use ($source) {
+            return [
+                'source'            => $source,
+                'voucher_type_id'   => $source->is(VoucherSource::PURCHASE()) ? randomOrCreate(VoucherType::class) : null,
+            ];
+        });
+    }
 }

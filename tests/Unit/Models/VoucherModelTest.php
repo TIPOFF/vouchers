@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tipoff\Authorization\Models\User;
 use Tipoff\Checkout\Models\Cart;
+use Tipoff\Vouchers\Enums\VoucherSource;
 use Tipoff\Vouchers\Exceptions\UnsupportedVoucherTypeException;
 use Tipoff\Vouchers\Exceptions\VoucherRedeemedException;
 use Tipoff\Vouchers\Models\Voucher;
@@ -373,5 +374,18 @@ class VoucherModelTest extends TestCase
         $this->assertCount(2, $codes);
         $this->assertEquals($voucher1->code, $codes[0]->code);
         $this->assertEquals($voucher2->code, $codes[1]->code);
+    }
+
+    /** @test */
+    public function create_refund_voucher()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $voucher = Voucher::createRefundVoucher(123, $user, 1000);
+        $this->assertEquals(VoucherSource::REFUND, $voucher->source->getValue());
+        $this->assertEquals(1000, $voucher->amount);
+        $this->assertNull($voucher->participants);
+        $this->assertEquals($user->id, $voucher->user_id);
     }
 }

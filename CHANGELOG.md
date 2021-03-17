@@ -45,3 +45,7 @@ All notable changes to `vouchers` will be documented in this file.
 ## 2.3.0 - 2021-03-16
 
 - amend vouchers migration
+
+## 2.3.1 - 2021-03-17
+
+- helper for sellable voucher type cart item

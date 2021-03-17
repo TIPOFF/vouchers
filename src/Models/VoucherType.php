@@ -8,12 +8,15 @@ use Assert\Assert;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Tipoff\Support\Contracts\Checkout\CartInterface;
+use Tipoff\Support\Contracts\Checkout\CartItemInterface;
 use Tipoff\Support\Contracts\Models\UserInterface;
 use Tipoff\Support\Contracts\Sellable\VoucherType as Sellable;
 use Tipoff\Support\Models\BaseModel;
 use Tipoff\Support\Traits\HasCreator;
 use Tipoff\Support\Traits\HasPackageFactory;
 use Tipoff\Support\Traits\HasUpdater;
+use Tipoff\Vouchers\Exceptions\UnsupportedVoucherTypeException;
 use Tipoff\Vouchers\Transformers\VoucherTypeTransformer;
 
 /**
@@ -101,6 +104,19 @@ class VoucherType extends BaseModel implements Sellable
     public function getDescription(): string
     {
         return $this->title;
+    }
+
+    public function createCartItem(int $locationId, int $quantity = 1): CartItemInterface
+    {
+        if (!$this->is_sellable) {
+            throw new UnsupportedVoucherTypeException();
+        }
+
+        /** @var CartInterface $service */
+        $service = findService(CartInterface::class);
+
+       return $service::createItem($this, $this->slug, $this->sell_price, $quantity)
+            ->setLocationId($locationId);
     }
 
     //endregion

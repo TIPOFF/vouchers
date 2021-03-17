@@ -8,6 +8,9 @@ use Assert\LazyAssertionException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tipoff\Authorization\Models\User;
+use Tipoff\Support\Contracts\Checkout\CartInterface;
+use Tipoff\Support\Contracts\Checkout\CartItemInterface;
+use Tipoff\Vouchers\Exceptions\UnsupportedVoucherTypeException;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Models\VoucherType;
 use Tipoff\Vouchers\Tests\TestCase;
@@ -93,6 +96,43 @@ class VoucherTypeModelTest extends TestCase
 
         $this->assertEquals(3, VoucherType::query()->isSellable(true)->count());
         $this->assertEquals(4, VoucherType::query()->isSellable(false)->count());
+    }
+
+    /** @test */
+    public function cart_item_not_sellable()
+    {
+        /** @var VoucherType $voucherType */
+        $voucherType = VoucherType::factory()->create([
+            'is_sellable' => false,
+        ]);
+
+        $this->expectException(UnsupportedVoucherTypeException::class);
+
+        $voucherType->createCartItem(123);
+    }
+
+    /** @test */
+    public function cart_item()
+    {
+        $cartItem = \Mockery::mock(CartItemInterface::class);
+        $cartItem->shouldReceive('setLocationId')
+            ->with(123)
+            ->once()
+            ->andReturnSelf();
+
+        $service = \Mockery::mock(CartInterface::class);
+        $service->shouldReceive('createItem')
+            ->once()
+            ->andReturn($cartItem);
+        $this->app->instance(CartInterface::class, $service);
+
+        /** @var VoucherType $voucherType */
+        $voucherType = VoucherType::factory()->create([
+            'is_sellable' => true,
+        ]);
+
+        $item = $voucherType->createCartItem(123);
+        $this->assertNotNull($item);
     }
 
     /** @test */

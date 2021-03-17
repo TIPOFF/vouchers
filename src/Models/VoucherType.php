@@ -108,14 +108,14 @@ class VoucherType extends BaseModel implements Sellable
 
     public function createCartItem(int $locationId, int $quantity = 1): CartItemInterface
     {
-        if (!$this->is_sellable) {
+        if (! $this->is_sellable) {
             throw new UnsupportedVoucherTypeException();
         }
 
         /** @var CartInterface $service */
         $service = findService(CartInterface::class);
 
-       return $service::createItem($this, $this->slug, $this->sell_price, $quantity)
+        return $service::createItem($this, $this->slug, $this->sell_price, $quantity)
             ->setLocationId($locationId);
     }
 

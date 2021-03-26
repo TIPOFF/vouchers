@@ -40,7 +40,7 @@ class Voucher extends BaseResource
             return $query;
         }
 
-        return $query->whereHas('order', function ($orderlocation) use ($request) {
+        return $query->whereHas('redemptionOrder', function ($orderlocation) use ($request) {
             return $orderlocation->whereIn('location_id', $request->user()->locations->pluck('id'));
         });
     }

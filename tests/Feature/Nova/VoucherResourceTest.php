@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Tests\Feature\Nova;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tipoff\Authorization\Models\User;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Tests\TestCase;
-use Tipoff\Authorization\Models\User;
 
 class VoucherResourceTest extends TestCase
 {
-use DatabaseTransactions;
+    use DatabaseTransactions;
 
     private const NOVA_ROUTE = 'nova-api/vouchers';
 
@@ -56,8 +56,7 @@ use DatabaseTransactions;
      * @test
      */
     public function show_by_role(?string $role, bool $hasAccess, bool $canView)
-    {        
-
+    {
         $user = User::factory()->create();
         if ($role) {
             $user->assignRole($role);

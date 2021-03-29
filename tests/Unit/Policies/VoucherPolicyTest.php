@@ -7,7 +7,6 @@ namespace Tipoff\Vouchers\Tests\Unit\Policies;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tipoff\Authorization\Models\User;
 use Tipoff\Locations\Models\Location;
-use Tipoff\Support\Contracts\Models\UserInterface;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Tests\TestCase;
 

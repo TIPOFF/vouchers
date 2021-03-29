@@ -29,20 +29,11 @@ class Voucher extends BaseResource
 
     public static function indexQuery(NovaRequest $request, $query)
     {
-        if ($request->user()->hasRole([
-            'Admin',
-            'Owner',
-            'Accountant',
-            'Executive',
-            'Reservation Manager',
-            'Reservationist',
-        ])) {
+        if ($request->user()->hasPermissionTo('all locations')) {
             return $query;
         }
 
-        return $query->whereHas('redemptionOrder', function ($orderlocation) use ($request) {
-            return $orderlocation->whereIn('location_id', $request->user()->locations->pluck('id'));
-        });
+        return $query->whereIn('location_id', $request->user()->locations->pluck('id'));
     }
 
     public static $group = 'Operations Units';

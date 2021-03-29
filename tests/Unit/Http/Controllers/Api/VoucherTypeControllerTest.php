@@ -22,13 +22,13 @@ class VoucherTypeControllerTest extends TestCase
         VoucherType::factory()->sellable(false)->count(2)->create();
 
         $this->actingAs($user);
-        $response = $this->getJson('tipoff/voucher-types')
+        $response = $this->getJson($this->apiUrl('voucher-types'))
             ->assertOk();
 
         $this->assertCount(0, $response->json('data'));
 
         VoucherType::factory()->sellable(true)->count(2)->create();
-        $response = $this->getJson('tipoff/voucher-types')
+        $response = $this->getJson($this->apiUrl('voucher-types'))
             ->assertOk();
 
         $this->assertCount(2, $response->json('data'));
@@ -44,7 +44,7 @@ class VoucherTypeControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $this->getJson("tipoff/voucher-types/{$voucherType->id}")
+        $this->getJson($this->apiUrl("voucher-types/{$voucherType->id}"))
             ->assertStatus(403);
     }
 
@@ -59,7 +59,7 @@ class VoucherTypeControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->getJson("tipoff/voucher-types/{$voucherType->id}")
+        $response = $this->getJson($this->apiUrl("voucher-types/{$voucherType->id}"))
             ->assertOk();
 
         $this->assertEquals($voucherType->id, $response->json('data.id'));
@@ -68,7 +68,7 @@ class VoucherTypeControllerTest extends TestCase
     /** @test */
     public function index_not_logged_in()
     {
-        $this->getJson('tipoff/voucher-types')
+        $this->getJson($this->apiUrl('voucher-types'))
             ->assertStatus(401);
     }
 
@@ -78,7 +78,7 @@ class VoucherTypeControllerTest extends TestCase
         /** @var VoucherType $voucherType */
         $voucherType = VoucherType::factory()->sellable()->create();
 
-        $this->getJson("tipoff/voucher-types/{$voucherType->id}")
+        $this->getJson($this->apiUrl("voucher-types/{$voucherType->id}"))
             ->assertStatus(401);
     }
 }

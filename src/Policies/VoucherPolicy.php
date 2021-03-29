@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Tipoff\Locations\Traits\HasLocationPermissions;
 use Tipoff\Support\Contracts\Models\UserInterface;
 use Tipoff\Vouchers\Models\Voucher;
 
 class VoucherPolicy
 {
     use HandlesAuthorization;
+    use HasLocationPermissions;
 
     public function viewAny(UserInterface $user): bool
     {
@@ -19,7 +21,7 @@ class VoucherPolicy
 
     public function view(UserInterface $user, Voucher $voucher): bool
     {
-        return $voucher->isOwner($user) || ($user->hasPermissionTo('view vouchers') ? true : false);
+        return $voucher->isOwner($user) || $this->hasLocationPermission($user, 'view vouchers', $voucher->location_id);
     }
 
     public function create(UserInterface $user): bool
@@ -29,7 +31,7 @@ class VoucherPolicy
 
     public function update(UserInterface $user, Voucher $voucher): bool
     {
-        return $user->hasPermissionTo('update vouchers') ? true : false;
+        return $this->hasLocationPermission($user, 'update vouchers', $voucher->location_id);
     }
 
     public function delete(UserInterface $user, Voucher $voucher): bool

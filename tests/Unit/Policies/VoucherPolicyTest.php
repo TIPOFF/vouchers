@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Tipoff\Vouchers\Tests\Unit\Policies;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tipoff\Support\Contracts\Models\UserInterface;
+use Tipoff\Authorization\Models\User;
+use Tipoff\Locations\Models\Location;
 use Tipoff\Vouchers\Models\Voucher;
 use Tipoff\Vouchers\Tests\TestCase;
 
@@ -27,26 +28,33 @@ class VoucherPolicyTest extends TestCase
      * @test
      * @dataProvider data_provider_for_all_permissions_as_creator
      */
-    public function all_permissions_as_creator(string $permission, UserInterface $user, bool $expected)
+    public function all_permissions_as_creator(string $action, ?string $permission, bool $expected)
     {
-        $discount = Voucher::factory()->make([
-            'creator_id' => $user,
+        $location = Location::factory()->create();
+        $user = User::factory()->create();
+        if ($permission) {
+            $user->givePermissionTo($permission);
+        }
+        $user->locations()->attach($location);
+
+        $voucher = Voucher::factory()->make([
+            'user_id' => $user,
+            'location_id' => $location,
         ]);
 
-        $this->assertEquals($expected, $user->can($permission, $discount));
+        $this->assertEquals($expected, $user->can($action, $voucher));
     }
 
     public function data_provider_for_all_permissions_as_creator()
     {
         return [
-            'view-true' => [ 'view', self::createPermissionedUser('view vouchers', true), true ],
-            'view-false' => [ 'view', self::createPermissionedUser('view vouchers', false), false ],
-            'create-true' => [ 'create', self::createPermissionedUser('create vouchers', true), true ],
-            'create-false' => [ 'create', self::createPermissionedUser('create vouchers', false), false ],
-            'update-true' => [ 'update', self::createPermissionedUser('update vouchers', true), true ],
-            'update-false' => [ 'update', self::createPermissionedUser('update vouchers', false), false ],
-            'delete-true' => [ 'delete', self::createPermissionedUser('delete vouchers', true), false ],
-            'delete-false' => [ 'delete', self::createPermissionedUser('delete vouchers', false), false ],
+            'view-true' => [ 'view', 'view vouchers', true ],
+            'view-false' => [ 'view', null, true ],
+            'create-true' => [ 'create', 'create vouchers', true ],
+            'create-false' => [ 'create', null, false ],
+            'update-true' => [ 'update', 'update vouchers', true ],
+            'update-false' => [ 'update', null, false ],
+            'delete-false' => [ 'delete', null, false ],
         ];
     }
 
@@ -54,16 +62,33 @@ class VoucherPolicyTest extends TestCase
      * @test
      * @dataProvider data_provider_for_all_permissions_not_creator
      */
-    public function all_permissions_not_creator(string $permission, UserInterface $user, bool $expected)
+    public function all_permissions_not_creator(string $action, ?string $permission, bool $expected)
     {
-        $discount = Voucher::factory()->make();
+        $location = Location::factory()->create();
+        $user = User::factory()->create();
+        if ($permission) {
+            $user->givePermissionTo($permission);
+        }
+        $user->locations()->attach($location);
 
-        $this->assertEquals($expected, $user->can($permission, $discount));
+        $voucher = Voucher::factory()->make([
+            'user_id' => User::factory()->create(),
+            'location_id' => $location,
+        ]);
+
+        $this->assertEquals($expected, $user->can($action, $voucher));
     }
 
     public function data_provider_for_all_permissions_not_creator()
     {
-        // Permissions are identical for creator or others
-        return $this->data_provider_for_all_permissions_as_creator();
+        return [
+            'view-true' => [ 'view', 'view vouchers', true ],
+            'view-false' => [ 'view', null, false ],
+            'create-true' => [ 'create', 'create vouchers', true ],
+            'create-false' => [ 'create', null, false ],
+            'update-true' => [ 'update', 'update vouchers', true ],
+            'update-false' => [ 'update', null, false ],
+            'delete-false' => [ 'delete', null, false ],
+        ];
     }
 }

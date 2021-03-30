@@ -32,7 +32,7 @@ class VoucherControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->getJson('tipoff/vouchers')
+        $response = $this->getJson($this->apiUrl('vouchers'))
             ->assertOk();
 
         $this->assertCount(4, $response->json('data'));
@@ -49,7 +49,7 @@ class VoucherControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->getJson("tipoff/vouchers/{$voucher->id}")
+        $response = $this->getJson($this->apiUrl("vouchers/{$voucher->id}"))
             ->assertOk();
 
         $this->assertEquals($voucher->code, $response->json('data.code'));
@@ -68,7 +68,7 @@ class VoucherControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->getJson("tipoff/vouchers/{$voucher->id}?include=voucherType")
+        $response = $this->getJson($this->apiUrl("vouchers/{$voucher->id}?include=voucherType"))
             ->assertOk();
 
         $this->assertEquals($voucher->code, $response->json('data.code'));
@@ -87,14 +87,14 @@ class VoucherControllerTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $this->getJson("tipoff/vouchers/{$voucher->id}")
+        $this->getJson($this->apiUrl("vouchers/{$voucher->id}"))
             ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     /** @test */
     public function index_not_logged_in()
     {
-        $this->getJson('tipoff/vouchers')
+        $this->getJson($this->apiUrl('vouchers'))
             ->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
@@ -103,7 +103,7 @@ class VoucherControllerTest extends TestCase
     {
         $voucher = Voucher::factory()->create();
 
-        $this->getJson("tipoff/vouchers/{$voucher->id}")
+        $this->getJson($this->apiUrl("vouchers/{$voucher->id}"))
             ->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 }

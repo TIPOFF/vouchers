@@ -49,3 +49,7 @@ All notable changes to `vouchers` will be documented in this file.
 ## 2.3.1 - 2021-03-17
 
 - helper for sellable voucher type cart item
+
+## 2.4.0 - 2021-04-11
+
+- bump package dependencies

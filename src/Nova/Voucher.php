@@ -24,7 +24,7 @@ class Voucher extends BaseResource
     public static $title = 'code';
 
     public static $search = [
-        'id', 'code'
+        'id', 'code',
     ];
 
     public static function indexQuery(NovaRequest $request, $query)

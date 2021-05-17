@@ -48,9 +48,14 @@ class VoucherType extends BaseResource
     public function fields(Request $request)
     {
         return array_filter([
-            Text::make('Name (Internal)', 'name')->required(),
-            Slug::make('Slug')->from('Name'),
-            Text::make('Title (What Customers See)', 'title')->required(),
+            Text::make('Name (Internal)', 'name')
+                ->rules('required')
+                ->creationRules('unique:voucher_types,name')
+                ->updateRules('unique:voucher_types,name,{{resourceId}}'),
+            Slug::make('Slug')->from('Name')->rules('required')
+                ->creationRules('unique:voucher_types,slug')
+                ->updateRules('unique:voucher_types,slug,{{resourceId}}'),
+            Text::make('Title (What Customers See)', 'title')->rules('required'),
             Boolean::make('Is Sellable'),
             Currency::make('Sell Price')->asMinorUnits()
                 ->step('0.01')
